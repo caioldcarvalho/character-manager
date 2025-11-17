@@ -1,8 +1,14 @@
 import type { Character, AbilityScores } from '$lib/types';
 
+function generateId(): string {
+  return `char_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
 function createCharacterStore() {
   let character = $state<Character>({
+    id: generateId(),
     name: '',
+    level: 1,
     abilityScores: {
       strength: 10,
       dexterity: 10,
@@ -12,7 +18,9 @@ function createCharacterStore() {
       charisma: 10
     },
     race: null,
-    class: null
+    class: null,
+    createdAt: new Date(),
+    updatedAt: new Date()
   });
 
   return {
@@ -33,7 +41,9 @@ function createCharacterStore() {
     },
     reset() {
       character = {
+        id: generateId(),
         name: '',
+        level: 1,
         abilityScores: {
           strength: 10,
           dexterity: 10,
@@ -43,8 +53,13 @@ function createCharacterStore() {
           charisma: 10
         },
         race: null,
-        class: null
+        class: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
+    },
+    getCharacter() {
+      return { ...character };
     }
   };
 }

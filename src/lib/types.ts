@@ -8,10 +8,14 @@ export interface AbilityScores {
 }
 
 export interface Character {
+  id: string;
   name: string;
+  level: number;
   abilityScores: AbilityScores;
   race: Race | null;
   class: CharacterClass | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface APIReference {

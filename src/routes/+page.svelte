@@ -1,11 +1,13 @@
 <script lang="ts">
   import { characterStore } from '$lib/stores/character.svelte';
+  import { appStore } from '$lib/stores/app.svelte';
   import Button from '$lib/components/ui/button.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import Input from '$lib/components/ui/input.svelte';
   import Label from '$lib/components/ui/label.svelte';
   import { getRaces, getRaceDetails, getClasses, getClassDetails } from '$lib/api';
   import type { APIReference, Race, CharacterClass } from '$lib/types';
+  import { goto } from '$app/navigation';
 
   let currentStep = $state(0);
   let nameInput = $state(characterStore.character.name);
@@ -183,7 +185,13 @@
 
   function finishCharacterCreation() {
     characterStore.setClass(selectedClassDetails);
-    showSummary = true;
+
+    // Adicionar personagem à app store
+    const character = characterStore.getCharacter();
+    appStore.addCharacter(character);
+
+    // Redirecionar para visualização do personagem
+    goto('/character');
   }
 
   function startOver() {
@@ -206,9 +214,9 @@
   }
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+<div class="min-h-screen bg-background p-4">
   <div class="container mx-auto max-w-4xl py-8">
-    <h1 class="text-4xl font-bold text-center mb-8 text-white">
+    <h1 class="text-4xl font-bold text-center mb-8 text-foreground">
       Criador de Personagem D&D 5e
     </h1>
 
@@ -298,10 +306,10 @@
             <div
               class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors
                 {index === currentStep
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-primary text-primary-foreground'
                   : index < currentStep
                     ? 'bg-green-600 text-white'
-                    : 'bg-gray-600 text-gray-300'}"
+                    : 'bg-muted text-muted-foreground'}"
             >
               {index + 1}
             </div>
@@ -310,8 +318,8 @@
           {#if index < steps.length - 1}
             <div
               class="h-1 flex-1 mx-2 transition-colors {index < currentStep
-                ? 'bg-green-600'
-                : 'bg-gray-600'}"
+                ? 'bg-primary'
+                : 'bg-border'}"
             ></div>
           {/if}
         {/each}
