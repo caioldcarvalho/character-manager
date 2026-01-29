@@ -1,5 +1,6 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
+  import { Skull, HeartPulse, AlertTriangle, Check, X } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -37,13 +38,13 @@
 {#if character && isDying}
   <div class="mt-6 p-4 border-2 rounded-lg {isDead ? 'border-red-600 bg-red-500/10' : isStabilized ? 'border-green-600 bg-green-500/10' : 'border-yellow-600 bg-yellow-500/10'}">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-lg font-bold {isDead ? 'text-red-400' : isStabilized ? 'text-green-400' : 'text-yellow-400'}">
+      <h3 class="text-lg font-bold flex items-center {isDead ? 'text-red-400' : isStabilized ? 'text-green-400' : 'text-yellow-400'}">
         {#if isDead}
-          ☠️ Morto
+          <Skull size={20} class="mr-2" /> Morto
         {:else if isStabilized}
-          ✅ Estabilizado
+          <HeartPulse size={20} class="mr-2" /> Estabilizado
         {:else}
-          ⚠️ Morrendo
+          <AlertTriangle size={20} class="mr-2" /> Morrendo
         {/if}
       </h3>
       <button
@@ -68,7 +69,7 @@
               aria-label="Sucesso {index + 1}"
             >
               {#if character.deathSaves.successes > index}
-                <span class="text-white font-bold">✓</span>
+                <span class="text-white font-bold"><Check size={16} /></span>
               {/if}
             </button>
           {/each}
@@ -88,7 +89,7 @@
               aria-label="Falha {index + 1}"
             >
               {#if character.deathSaves.failures > index}
-                <span class="text-white font-bold">✕</span>
+                <span class="text-white font-bold"><X size={16} /></span>
               {/if}
             </button>
           {/each}

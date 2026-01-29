@@ -2,10 +2,11 @@
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import DeathSavesTracker from './DeathSavesTracker.svelte';
+  import { X } from 'lucide-svelte';
 
-  let damageAmount = $state(0);
-  let healAmount = $state(0);
-  let tempHPAmount = $state(0);
+  let damageAmount = $state<number | null>(null);
+  let healAmount = $state<number | null>(null);
+  let tempHPAmount = $state<number | null>(null);
 
   const character = $derived(appStore.activeCharacter);
   const hpPercentage = $derived(
@@ -16,22 +17,23 @@
   );
 
   function handleTakeDamage() {
-    if (character && damageAmount > 0) {
+    if (character && damageAmount && damageAmount > 0) {
       appStore.takeDamage(character.id, damageAmount);
-      damageAmount = 0;
+      damageAmount = null;
     }
   }
 
   function handleHeal() {
-    if (character && healAmount > 0) {
+    if (character && healAmount && healAmount > 0) {
       appStore.heal(character.id, healAmount);
-      healAmount = 0;
+      healAmount = null;
     }
   }
 
   function handleSetTempHP() {
-    if (character && tempHPAmount >= 0) {
+    if (character && tempHPAmount !== null && tempHPAmount >= 0) {
       appStore.updateHP(character.id, character.hitPoints.current, tempHPAmount);
+      tempHPAmount = null;
     }
   }
 </script>
@@ -70,10 +72,10 @@
             <span class="text-lg font-bold text-blue-400">+{character.hitPoints.temporary}</span>
             <button
               onclick={() => appStore.updateHP(character.id, character.hitPoints.current, 0)}
-              class="text-blue-400 hover:text-blue-300 transition-colors text-xl leading-none"
+              class="text-blue-400 hover:text-blue-300 transition-colors"
               aria-label="Remover PV Temporários"
             >
-              ✕
+              <X size={20} />
             </button>
           </div>
         </div>
@@ -88,7 +90,7 @@
           bind:value={damageAmount}
           min="0"
           placeholder="Dano"
-          class="flex-1 px-3 py-2 bg-secondary border border-input rounded-md text-foreground"
+          class="flex-1 px-3 py-2 bg-secondary border border-input rounded-md text-foreground placeholder:text-muted-foreground"
         />
         <button
           onclick={handleTakeDamage}
@@ -105,7 +107,7 @@
           bind:value={healAmount}
           min="0"
           placeholder="Cura"
-          class="flex-1 px-3 py-2 bg-secondary border border-input rounded-md text-foreground"
+          class="flex-1 px-3 py-2 bg-secondary border border-input rounded-md text-foreground placeholder:text-muted-foreground"
         />
         <button
           onclick={handleHeal}
@@ -122,7 +124,7 @@
           bind:value={tempHPAmount}
           min="0"
           placeholder="PV Temporário"
-          class="flex-1 px-3 py-2 bg-secondary border border-input rounded-md text-foreground"
+          class="flex-1 px-3 py-2 bg-secondary border border-input rounded-md text-foreground placeholder:text-muted-foreground"
         />
         <button
           onclick={handleSetTempHP}

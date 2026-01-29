@@ -9,6 +9,7 @@
   import type { APIReference, Race, CharacterClass } from '$lib/types';
   import { goto } from '$app/navigation';
   import { createSamplePaladin } from '$lib/utils/sample-paladin';
+  import { Upload, UserPlus } from 'lucide-svelte';
 
   let currentStep = $state(0);
   let nameInput = $state(characterStore.character.name);
@@ -257,10 +258,10 @@
       </h1>
       <div class="flex gap-2">
         <Button onclick={importCharacter} variant="outline" class="flex items-center gap-2">
-          📤 Importar
+          <Upload size={16} /> Importar
         </Button>
         <Button onclick={loadSamplePaladin} variant="outline" class="flex items-center gap-2">
-          ⚔️ Carregar Paladino de Teste
+          <UserPlus size={16} /> Carregar Paladino de Teste
         </Button>
       </div>
     </div>

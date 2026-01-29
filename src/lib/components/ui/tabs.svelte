@@ -7,7 +7,7 @@
     class: className,
   }: {
     activeTab?: string;
-    tabs: { id: string; label: string; icon?: string }[];
+    tabs: { id: string; label: string; icon?: any }[];
     class?: string;
   } = $props();
 
@@ -23,14 +23,20 @@
         type="button"
         onclick={() => selectTab(tab.id)}
         class={cn(
-          "px-4 py-3 text-sm font-medium transition-colors relative",
+          "px-4 py-3 text-sm font-medium transition-colors relative flex items-center",
           activeTab === tab.id
             ? "text-primary"
             : "text-muted-foreground hover:text-foreground"
         )}
       >
         {#if tab.icon}
-          <span class="mr-2">{tab.icon}</span>
+          <span class="mr-2 flex items-center">
+             {#if typeof tab.icon === 'string'}
+                {tab.icon}
+             {:else}
+                <svelte:component this={tab.icon} size={18} />
+             {/if}
+          </span>
         {/if}
         {tab.label}
 

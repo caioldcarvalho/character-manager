@@ -2,6 +2,7 @@
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import { calculateInitiative, formatModifier, getFinalAbilityScore } from '$lib/utils/character';
+  import { Dices } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
   const initiative = $derived(character ? calculateInitiative(character) : 0);
@@ -29,9 +30,9 @@
     <!-- Roll Button -->
     <button
       onclick={rollInitiative}
-      class="w-full px-4 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-bold transition-colors"
+      class="w-full px-4 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-bold transition-colors flex items-center justify-center gap-2"
     >
-      🎲 Rolar Iniciativa
+      <Dices size={24} /> Rolar Iniciativa
     </button>
 
     <!-- Roll Result -->

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
+  import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -90,7 +91,11 @@
                 </span>
               {/if}
               <span class="text-muted-foreground">
-                {expandedFeatures.has(feature.name) ? '▼' : '▶'}
+                {#if expandedFeatures.has(feature.name)}
+                  <ChevronDown size={20} />
+                {:else}
+                  <ChevronRight size={20} />
+                {/if}
               </span>
             </div>
           </button>
