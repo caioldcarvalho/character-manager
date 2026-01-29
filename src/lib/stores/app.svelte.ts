@@ -47,7 +47,10 @@ function migrateCharacter(char: any): Character {
     paladinResources: char.paladinResources || {
       layOnHands: { current: level * 5, max: level * 5 },
       channelDivinity: { current: 1, max: 1 }
-    }
+    },
+    weapons: char.weapons || [],
+    statusConditions: char.statusConditions || [],
+    deathSaves: char.deathSaves || { successes: 0, failures: 0, stabilized: false }
   };
 }
 
@@ -138,6 +141,12 @@ function createAppStore() {
       if (!char) return;
 
       char.hitPoints.current = Math.min(char.hitPoints.max, char.hitPoints.current + amount);
+
+      // Reset death saves when healed above 0
+      if (char.hitPoints.current > 0) {
+        char.deathSaves = { successes: 0, failures: 0, stabilized: false };
+      }
+
       this.saveToLocalStorage();
     },
 
@@ -201,6 +210,9 @@ function createAppStore() {
       // Restore paladin resources
       char.paladinResources.layOnHands.current = char.paladinResources.layOnHands.max;
       char.paladinResources.channelDivinity.current = char.paladinResources.channelDivinity.max;
+
+      // Reset death saves
+      char.deathSaves = { successes: 0, failures: 0, stabilized: false };
 
       this.saveToLocalStorage();
     },
@@ -282,6 +294,85 @@ function createAppStore() {
       } catch (e) {
         return { success: false, error: 'Invalid JSON format' };
       }
+    },
+
+    // Weapons
+    addWeapon(id: string, weapon: any) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.weapons.push(weapon);
+      this.saveToLocalStorage();
+    },
+
+    removeWeapon(id: string, weaponId: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.weapons = char.weapons.filter(w => w.id !== weaponId);
+      this.saveToLocalStorage();
+    },
+
+    toggleWeaponEquipped(id: string, weaponId: string) {
+      const char = state.characters.find(c => c.id === id);
+      const weapon = char?.weapons.find(w => w.id === weaponId);
+      if (weapon) {
+        weapon.equipped = !weapon.equipped;
+        this.saveToLocalStorage();
+      }
+    },
+
+    // Status Conditions
+    toggleStatusCondition(id: string, conditionName: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+
+      const index = char.statusConditions.indexOf(conditionName);
+      if (index > -1) {
+        char.statusConditions.splice(index, 1);
+      } else {
+        char.statusConditions.push(conditionName);
+      }
+      this.saveToLocalStorage();
+    },
+
+    clearStatusConditions(id: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.statusConditions = [];
+      this.saveToLocalStorage();
+    },
+
+    // Death Saves
+    recordDeathSave(id: string, type: 'success' | 'failure') {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+
+      if (type === 'success') {
+        char.deathSaves.successes = Math.min(3, char.deathSaves.successes + 1);
+        if (char.deathSaves.successes >= 3) char.deathSaves.stabilized = true;
+      } else {
+        char.deathSaves.failures = Math.min(3, char.deathSaves.failures + 1);
+      }
+      this.saveToLocalStorage();
+    },
+
+    removeDeathSave(id: string, type: 'success' | 'failure') {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+
+      if (type === 'success') {
+        char.deathSaves.successes = Math.max(0, char.deathSaves.successes - 1);
+        if (char.deathSaves.successes < 3) char.deathSaves.stabilized = false;
+      } else {
+        char.deathSaves.failures = Math.max(0, char.deathSaves.failures - 1);
+      }
+      this.saveToLocalStorage();
+    },
+
+    resetDeathSaves(id: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.deathSaves = { successes: 0, failures: 0, stabilized: false };
+      this.saveToLocalStorage();
     }
   };
 }

@@ -62,6 +62,26 @@ export interface PaladinResources {
   channelDivinity: { current: number; max: number };
 }
 
+// Weapons
+export interface Weapon {
+  id: string;
+  name: string;
+  type: 'melee' | 'ranged';
+  damageType: 'slashing' | 'piercing' | 'bludgeoning';
+  damageDice: string; // e.g., "2d6", "1d8"
+  properties: string[];
+  equipped: boolean;
+  finesse: boolean;
+  range?: string;
+}
+
+// Death Saves
+export interface DeathSaves {
+  successes: number; // 0-3
+  failures: number;  // 0-3
+  stabilized: boolean;
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -80,6 +100,9 @@ export interface Character {
   classFeatures: ClassFeature[];
   fightingStyle: string;
   paladinResources: PaladinResources;
+  weapons: Weapon[];
+  statusConditions: string[];
+  deathSaves: DeathSaves;
 }
 
 export interface APIReference {

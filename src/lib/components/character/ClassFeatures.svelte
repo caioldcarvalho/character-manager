@@ -97,7 +97,7 @@
 
           {#if expandedFeatures.has(feature.name)}
             <div class="p-4 bg-background border-t border-border">
-              <p class="text-sm text-muted-foreground mb-3">{feature.description}</p>
+              <p class="text-sm text-foreground/80 mb-3">{feature.description}</p>
               {#if feature.uses && feature.uses.current > 0}
                 <button
                   onclick={() => useFeature(feature.name)}

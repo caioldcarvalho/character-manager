@@ -97,6 +97,31 @@ export function createSamplePaladin(): Character {
       layOnHands: { current: level * 5, max: level * 5 }, // 25 HP pool
       channelDivinity: { current: 1, max: 1 }
     },
+    weapons: [
+      {
+        id: 'longsword-1',
+        name: 'Espada Longa',
+        type: 'melee',
+        damageType: 'slashing',
+        damageDice: '1d8',
+        properties: ['versatile (1d10)'],
+        equipped: true,
+        finesse: false
+      },
+      {
+        id: 'javelin-1',
+        name: 'Azagaia',
+        type: 'ranged',
+        damageType: 'piercing',
+        damageDice: '1d6',
+        properties: ['thrown (range 30/120)'],
+        equipped: false,
+        finesse: false,
+        range: '30/120 pés'
+      }
+    ],
+    statusConditions: [],
+    deathSaves: { successes: 0, failures: 0, stabilized: false },
     createdAt: new Date(),
     updatedAt: new Date()
   };

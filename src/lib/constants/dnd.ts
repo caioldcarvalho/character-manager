@@ -120,3 +120,77 @@ export function calculatePaladinMaxHP(level: number, conModifier: number): numbe
   // Each additional level: d10 (average 6) + CON modifier
   return 10 + conModifier + (level - 1) * (6 + conModifier);
 }
+
+// D&D 5e Conditions
+export const DND_CONDITIONS = [
+  {
+    name: 'Cego',
+    description: 'Falha automaticamente em testes que requerem visão. Ataques contra você têm vantagem. Seus ataques têm desvantagem.',
+    icon: '👁️'
+  },
+  {
+    name: 'Surdo',
+    description: 'Falha automaticamente em testes que requerem audição.',
+    icon: '🔇'
+  },
+  {
+    name: 'Amedrontado',
+    description: 'Desvantagem em testes de atributo e ataques enquanto a fonte do medo estiver em seu campo de visão. Não pode se mover voluntariamente para perto da fonte.',
+    icon: '😨'
+  },
+  {
+    name: 'Agarrado',
+    description: 'Velocidade se torna 0 e não pode se beneficiar de bônus de velocidade. Condição termina se o agarrador estiver incapacitado.',
+    icon: '🤝'
+  },
+  {
+    name: 'Incapacitado',
+    description: 'Não pode realizar ações ou reações.',
+    icon: '💫'
+  },
+  {
+    name: 'Invisível',
+    description: 'Impossível de ver sem auxílio de magia ou sentido especial. Ataques contra você têm desvantagem. Seus ataques têm vantagem.',
+    icon: '👻'
+  },
+  {
+    name: 'Paralisado',
+    description: 'Incapacitado, não pode se mover ou falar. Falha automaticamente em testes de Força e Destreza. Ataques contra você têm vantagem. Qualquer ataque que acerte é crítico se estiver a 1,5m.',
+    icon: '🥶'
+  },
+  {
+    name: 'Petrificado',
+    description: 'Transformado em substância sólida inanimada junto com objetos não-mágicos que estiver vestindo ou carregando. Peso multiplicado por 10. Resistência a todo dano. Imune a veneno e doença.',
+    icon: '🗿'
+  },
+  {
+    name: 'Envenenado',
+    description: 'Desvantagem em jogadas de ataque e testes de atributo.',
+    icon: '☠️'
+  },
+  {
+    name: 'Caído',
+    description: 'Só pode rastejar ou levantar (gasta metade do movimento). Desvantagem em ataques. Ataques corpo a corpo contra você têm vantagem. Ataques à distância têm desvantagem.',
+    icon: '🤕'
+  },
+  {
+    name: 'Contido',
+    description: 'Velocidade 0. Ataques contra você têm vantagem. Seus ataques têm desvantagem. Desvantagem em Destreza.',
+    icon: '⛓️'
+  },
+  {
+    name: 'Atordoado',
+    description: 'Incapacitado, não pode se mover e fala apenas hesitantemente. Falha automaticamente em testes de Força e Destreza. Ataques contra você têm vantagem.',
+    icon: '😵'
+  },
+  {
+    name: 'Inconsciente',
+    description: 'Incapacitado, não pode se mover ou falar e está inconsciente do entorno. Solta o que estiver segurando e cai. Falha em testes de Força e Destreza. Ataques têm vantagem. Qualquer ataque que acerte é crítico se estiver a 1,5m.',
+    icon: '😴'
+  },
+  {
+    name: 'Exausto',
+    description: 'Níveis crescentes de penalidades. Nível 1: Desvantagem em testes. Nível 2: Velocidade reduzida pela metade. Nível 3: Desvantagem em ataques e salvamentos. Nível 4: HP máximo reduzido pela metade. Nível 5: Velocidade reduzida a 0. Nível 6: Morte.',
+    icon: '😫'
+  }
+];

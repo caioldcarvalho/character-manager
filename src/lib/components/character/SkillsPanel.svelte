@@ -51,7 +51,7 @@
     <div class="space-y-6">
       {#each Object.entries(skillsByAbility()) as [ability, skills]}
         <div>
-          <h3 class="text-sm font-bold text-muted-foreground uppercase mb-3">
+          <h3 class="text-sm font-bold text-foreground/70 uppercase mb-3">
             {abilityNames[ability]}
           </h3>
           <div class="space-y-1">

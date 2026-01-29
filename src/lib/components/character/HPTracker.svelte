@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
+  import DeathSavesTracker from './DeathSavesTracker.svelte';
 
   let damageAmount = $state(0);
   let healAmount = $state(0);
@@ -65,7 +66,16 @@
       <div class="mb-4 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium">PV Temporários</span>
-          <span class="text-lg font-bold text-blue-400">+{character.hitPoints.temporary}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-bold text-blue-400">+{character.hitPoints.temporary}</span>
+            <button
+              onclick={() => appStore.updateHP(character.id, character.hitPoints.current, 0)}
+              class="text-blue-400 hover:text-blue-300 transition-colors text-xl leading-none"
+              aria-label="Remover PV Temporários"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       </div>
     {/if}
@@ -122,5 +132,8 @@
         </button>
       </div>
     </div>
+
+    <!-- Death Saves Tracker -->
+    <DeathSavesTracker />
   </Card>
 {/if}

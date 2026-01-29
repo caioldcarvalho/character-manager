@@ -72,3 +72,41 @@ export function calculatePreparedSpellCount(character: Character): number {
   const halfLevel = Math.floor(character.level / 2);
   return Math.max(1, chaModifier + halfLevel);
 }
+
+// Calculate weapon attack bonus
+export function calculateWeaponAttackBonus(character: Character, weapon: any): number {
+  const strScore = getFinalAbilityScore(character, 'strength');
+  const dexScore = getFinalAbilityScore(character, 'dexterity');
+
+  let abilityModifier: number;
+  if (weapon.finesse) {
+    // Use higher of STR or DEX
+    abilityModifier = Math.max(calculateModifier(strScore), calculateModifier(dexScore));
+  } else if (weapon.type === 'ranged') {
+    abilityModifier = calculateModifier(dexScore);
+  } else {
+    abilityModifier = calculateModifier(strScore);
+  }
+
+  return abilityModifier + character.combatStats.proficiencyBonus;
+}
+
+// Calculate weapon damage bonus
+export function calculateWeaponDamageBonus(character: Character, weapon: any): number {
+  const strScore = getFinalAbilityScore(character, 'strength');
+  const dexScore = getFinalAbilityScore(character, 'dexterity');
+
+  if (weapon.finesse) {
+    return Math.max(calculateModifier(strScore), calculateModifier(dexScore));
+  } else if (weapon.type === 'ranged') {
+    return calculateModifier(dexScore);
+  } else {
+    return calculateModifier(strScore);
+  }
+}
+
+// Format damage roll
+export function formatDamageRoll(dice: string, bonus: number): string {
+  if (bonus === 0) return dice;
+  return `${dice}${bonus >= 0 ? '+' : ''}${bonus}`;
+}

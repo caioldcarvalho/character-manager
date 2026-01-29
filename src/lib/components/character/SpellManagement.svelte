@@ -221,7 +221,7 @@
                           <span class="ml-2 font-medium">{spell.duration}</span>
                         </div>
                       </div>
-                      <div class="text-sm text-muted-foreground">
+                      <div class="text-sm text-foreground/80">
                         {spell.description}
                       </div>
                     </div>

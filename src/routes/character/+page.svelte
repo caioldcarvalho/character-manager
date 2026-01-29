@@ -8,6 +8,8 @@
   import ImportExport from '$lib/components/character/ImportExport.svelte';
   import SkillsPanel from '$lib/components/character/SkillsPanel.svelte';
   import SpellManagement from '$lib/components/character/SpellManagement.svelte';
+  import AttacksPanel from '$lib/components/character/AttacksPanel.svelte';
+  import StatusConditionsPanel from '$lib/components/character/StatusConditionsPanel.svelte';
   import {
     getFinalAbilityScore,
     formatModifier,
@@ -23,6 +25,23 @@
     { key: 'wisdom', label: 'Sabedoria', abbr: 'SAB' },
     { key: 'charisma', label: 'Carisma', abbr: 'CAR' }
   ];
+
+  let editingName = $state(false);
+  let nameInput = $state('');
+
+  function startEdit() {
+    if (appStore.activeCharacter) {
+      nameInput = appStore.activeCharacter.name;
+      editingName = true;
+    }
+  }
+
+  function saveName() {
+    if (appStore.activeCharacter && nameInput.trim() && nameInput !== appStore.activeCharacter.name) {
+      appStore.updateCharacter(appStore.activeCharacter.id, { name: nameInput.trim() });
+    }
+    editingName = false;
+  }
 </script>
 
 {#if appStore.state.activeTab === 'summary' && appStore.activeCharacter}
@@ -33,8 +52,26 @@
   <div class="space-y-6">
     <!-- Header with Import/Export -->
     <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold">{character.name}</h1>
+      <div class="flex-1">
+        <div class="flex items-center gap-2">
+          {#if editingName}
+            <input
+              type="text"
+              bind:value={nameInput}
+              onblur={saveName}
+              onkeydown={(e) => e.key === 'Enter' && saveName()}
+              class="text-3xl font-bold bg-background border-b-2 border-primary focus:outline-none min-w-[200px]"
+              autofocus
+            />
+          {:else}
+            <h1 class="text-3xl font-bold cursor-pointer hover:text-primary transition-colors" onclick={startEdit}>
+              {character.name}
+            </h1>
+            <button onclick={startEdit} class="text-muted-foreground hover:text-foreground transition-colors" aria-label="Editar nome">
+              ✏️
+            </button>
+          {/if}
+        </div>
         <p class="text-lg text-muted-foreground">
           {character.race?.name || 'Raça desconhecida'} {character.class?.name || 'Classe desconhecida'} - Nível {character.level}
         </p>
@@ -74,7 +111,7 @@
       <h2 class="text-xl font-bold mb-4">Atributos</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {#each abilities as ability}
-          {@const score = getFinalAbilityScore(character, ability.key)}
+          {@const score = getFinalAbilityScore(character, ability.key as keyof typeof character.abilityScores)}
           <div class="flex flex-col items-center p-4 bg-secondary rounded-lg">
             <div class="text-sm text-muted-foreground font-medium">{ability.abbr}</div>
             <div class="text-3xl font-bold my-2">{score}</div>
@@ -84,6 +121,12 @@
         {/each}
       </div>
     </Card>
+
+    <!-- Attacks Panel -->
+    <AttacksPanel />
+
+    <!-- Status Conditions Panel -->
+    <StatusConditionsPanel />
 
     <!-- Class Features -->
     <ClassFeatures />

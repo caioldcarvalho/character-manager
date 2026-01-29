@@ -219,6 +219,34 @@
     appStore.addCharacter(paladin);
     goto('/character');
   }
+
+  let fileInput: HTMLInputElement;
+  let importMessage = $state<{type: 'success' | 'error'; text: string} | null>(null);
+
+  function importCharacter() {
+    fileInput.click();
+  }
+
+  async function handleFileImport(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const result = appStore.importCharacter(text);
+
+      if (result.success) {
+        importMessage = { type: 'success', text: 'Personagem importado com sucesso!' };
+        setTimeout(() => goto('/character'), 1500);
+      } else {
+        importMessage = { type: 'error', text: result.error || 'Erro ao importar' };
+        setTimeout(() => importMessage = null, 3000);
+      }
+    } catch (e) {
+      importMessage = { type: 'error', text: 'Erro ao ler arquivo' };
+      setTimeout(() => importMessage = null, 3000);
+    }
+  }
 </script>
 
 <div class="min-h-screen bg-background p-4">
@@ -227,10 +255,25 @@
       <h1 class="text-4xl font-bold text-foreground">
         Criador de Personagem D&D 5e
       </h1>
-      <Button onclick={loadSamplePaladin} variant="outline" class="flex items-center gap-2">
-        ⚔️ Carregar Paladino de Teste
-      </Button>
+      <div class="flex gap-2">
+        <Button onclick={importCharacter} variant="outline" class="flex items-center gap-2">
+          📤 Importar
+        </Button>
+        <Button onclick={loadSamplePaladin} variant="outline" class="flex items-center gap-2">
+          ⚔️ Carregar Paladino de Teste
+        </Button>
+      </div>
     </div>
+
+    <!-- Import Message -->
+    {#if importMessage}
+      <div class="mb-4 p-4 rounded-lg {importMessage.type === 'success' ? 'bg-green-500/20 border border-green-500 text-green-400' : 'bg-red-500/20 border border-red-500 text-red-400'}">
+        {importMessage.text}
+      </div>
+    {/if}
+
+    <!-- Hidden file input -->
+    <input bind:this={fileInput} type="file" accept=".json" onchange={handleFileImport} class="hidden" />
 
     {#if showSummary}
       <!-- Character Summary -->
