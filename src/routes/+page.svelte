@@ -8,6 +8,7 @@
   import { getRaces, getRaceDetails, getClasses, getClassDetails } from '$lib/api';
   import type { APIReference, Race, CharacterClass } from '$lib/types';
   import { goto } from '$app/navigation';
+  import { createSamplePaladin } from '$lib/utils/sample-paladin';
 
   let currentStep = $state(0);
   let nameInput = $state(characterStore.character.name);
@@ -212,13 +213,24 @@
       charisma: 10
     };
   }
+
+  function loadSamplePaladin() {
+    const paladin = createSamplePaladin();
+    appStore.addCharacter(paladin);
+    goto('/character');
+  }
 </script>
 
 <div class="min-h-screen bg-background p-4">
   <div class="container mx-auto max-w-4xl py-8">
-    <h1 class="text-4xl font-bold text-center mb-8 text-foreground">
-      Criador de Personagem D&D 5e
-    </h1>
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-4xl font-bold text-foreground">
+        Criador de Personagem D&D 5e
+      </h1>
+      <Button onclick={loadSamplePaladin} variant="outline" class="flex items-center gap-2">
+        ⚔️ Carregar Paladino de Teste
+      </Button>
+    </div>
 
     {#if showSummary}
       <!-- Character Summary -->

@@ -7,6 +7,61 @@ export interface AbilityScores {
   charisma: number;
 }
 
+// HP tracking
+export interface HitPoints {
+  current: number;
+  max: number;
+  temporary: number;
+}
+
+// Combat stats
+export interface CombatStats {
+  initiative: number;
+  armorClass: number;
+  speed: number;
+  proficiencyBonus: number;
+}
+
+// Skill system
+export interface Skill {
+  name: string;
+  ability: keyof AbilityScores;
+  proficient: boolean;
+}
+
+// Spell slots by level
+export interface SpellSlots {
+  level1: { current: number; max: number };
+  level2: { current: number; max: number };
+}
+
+// Individual spell
+export interface Spell {
+  name: string;
+  level: number;
+  school: string;
+  castingTime: string;
+  range: string;
+  duration: string;
+  concentration: boolean;
+  description: string;
+  prepared: boolean;
+}
+
+// Class features
+export interface ClassFeature {
+  name: string;
+  description: string;
+  level: number;
+  uses?: { current: number; max: number };
+}
+
+// Paladin resources
+export interface PaladinResources {
+  layOnHands: { current: number; max: number };
+  channelDivinity: { current: number; max: number };
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -16,6 +71,15 @@ export interface Character {
   class: CharacterClass | null;
   createdAt?: Date;
   updatedAt?: Date;
+  hitPoints: HitPoints;
+  combatStats: CombatStats;
+  skills: Record<string, Skill>;
+  spellSlots: SpellSlots;
+  knownSpells: Spell[];
+  preparedSpells: string[];
+  classFeatures: ClassFeature[];
+  fightingStyle: string;
+  paladinResources: PaladinResources;
 }
 
 export interface APIReference {

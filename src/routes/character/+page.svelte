@@ -1,6 +1,19 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
+  import HPTracker from '$lib/components/character/HPTracker.svelte';
+  import InitiativeTracker from '$lib/components/character/InitiativeTracker.svelte';
+  import SpellSlots from '$lib/components/character/SpellSlots.svelte';
+  import ClassFeatures from '$lib/components/character/ClassFeatures.svelte';
+  import ImportExport from '$lib/components/character/ImportExport.svelte';
+  import SkillsPanel from '$lib/components/character/SkillsPanel.svelte';
+  import SpellManagement from '$lib/components/character/SpellManagement.svelte';
+  import {
+    getFinalAbilityScore,
+    formatModifier,
+    calculateSpellSaveDC,
+    calculateSpellAttackBonus
+  } from '$lib/utils/character';
 
   const abilities = [
     { key: 'strength', label: 'Força', abbr: 'FOR' },
@@ -10,45 +23,15 @@
     { key: 'wisdom', label: 'Sabedoria', abbr: 'SAB' },
     { key: 'charisma', label: 'Carisma', abbr: 'CAR' }
   ];
-
-  function calculateModifier(score: number): string {
-    const modifier = Math.floor((score - 10) / 2);
-    return modifier >= 0 ? `+${modifier}` : `${modifier}`;
-  }
-
-  function getAbilityScore(key: string): number {
-    const char = appStore.activeCharacter;
-    if (!char) return 10;
-    return char.abilityScores[key as keyof typeof char.abilityScores] || 10;
-  }
-
-  function getFinalAbilityScore(key: string): number {
-    const base = getAbilityScore(key);
-    const char = appStore.activeCharacter;
-    if (!char?.race) return base;
-
-    const abilityMap: Record<string, string> = {
-      strength: 'str',
-      dexterity: 'dex',
-      constitution: 'con',
-      intelligence: 'int',
-      wisdom: 'wis',
-      charisma: 'cha'
-    };
-
-    const bonus = char.race.ability_bonuses.find(
-      b => b.ability_score.index === abilityMap[key]
-    );
-
-    return base + (bonus?.bonus || 0);
-  }
 </script>
 
 {#if appStore.state.activeTab === 'summary' && appStore.activeCharacter}
   {@const character = appStore.activeCharacter}
+  {@const spellSaveDC = calculateSpellSaveDC(character)}
+  {@const spellAttackBonus = calculateSpellAttackBonus(character)}
 
   <div class="space-y-6">
-    <!-- Header -->
+    <!-- Header with Import/Export -->
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-3xl font-bold">{character.name}</h1>
@@ -56,26 +39,60 @@
           {character.race?.name || 'Raça desconhecida'} {character.class?.name || 'Classe desconhecida'} - Nível {character.level}
         </p>
       </div>
+      <ImportExport />
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Atributos -->
-      <Card class="lg:col-span-2 p-6">
-        <h2 class="text-xl font-bold mb-4">Atributos</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {#each abilities as ability}
-            {@const score = getFinalAbilityScore(ability.key)}
-            <div class="flex flex-col items-center p-4 bg-secondary rounded-lg">
-              <div class="text-sm text-muted-foreground font-medium">{ability.abbr}</div>
-              <div class="text-3xl font-bold my-2">{score}</div>
-              <div class="text-lg text-primary font-semibold">{calculateModifier(score)}</div>
-              <div class="text-xs text-muted-foreground mt-1">{ability.label}</div>
-            </div>
-          {/each}
+    <!-- Combat Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <HPTracker />
+      <InitiativeTracker />
+
+      <!-- Spell Stats Card -->
+      <Card class="p-6">
+        <h2 class="text-xl font-bold mb-4">Magia</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+            <span class="text-sm font-medium">CD de Magia</span>
+            <span class="text-2xl font-bold text-primary">{spellSaveDC}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+            <span class="text-sm font-medium">Ataque Mágico</span>
+            <span class="text-2xl font-bold text-primary">
+              {spellAttackBonus >= 0 ? '+' : ''}{spellAttackBonus}
+            </span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+            <span class="text-sm font-medium">CA</span>
+            <span class="text-2xl font-bold">{character.combatStats.armorClass}</span>
+          </div>
         </div>
       </Card>
+    </div>
 
-      <!-- Info básica -->
+    <!-- Ability Scores Row -->
+    <Card class="p-6">
+      <h2 class="text-xl font-bold mb-4">Atributos</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {#each abilities as ability}
+          {@const score = getFinalAbilityScore(character, ability.key)}
+          <div class="flex flex-col items-center p-4 bg-secondary rounded-lg">
+            <div class="text-sm text-muted-foreground font-medium">{ability.abbr}</div>
+            <div class="text-3xl font-bold my-2">{score}</div>
+            <div class="text-lg text-primary font-semibold">{formatModifier(score)}</div>
+            <div class="text-xs text-muted-foreground mt-1">{ability.label}</div>
+          </div>
+        {/each}
+      </div>
+    </Card>
+
+    <!-- Class Features -->
+    <ClassFeatures />
+
+    <!-- Resources Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <SpellSlots />
+
+      <!-- Info Card -->
       <Card class="p-6 space-y-4">
         <h2 class="text-xl font-bold mb-4">Informações</h2>
 
@@ -92,6 +109,11 @@
         <div>
           <div class="text-sm text-muted-foreground">Nível</div>
           <div class="font-semibold">{character.level}</div>
+        </div>
+
+        <div>
+          <div class="text-sm text-muted-foreground">Bônus de Proficiência</div>
+          <div class="font-semibold">+{character.combatStats.proficiencyBonus}</div>
         </div>
 
         {#if character.race}
@@ -149,8 +171,11 @@
         <h2 class="text-xl font-bold mb-4">Testes de Resistência</h2>
         <div class="flex gap-3 flex-wrap">
           {#each character.class.saving_throws as save}
+            {@const saveAbility = save.index as keyof typeof character.abilityScores}
+            {@const saveScore = getFinalAbilityScore(character, saveAbility)}
+            {@const saveBonus = Math.floor((saveScore - 10) / 2) + character.combatStats.proficiencyBonus}
             <div class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold">
-              {save.name}
+              {save.name} {saveBonus >= 0 ? '+' : ''}{saveBonus}
             </div>
           {/each}
         </div>
@@ -158,11 +183,7 @@
     {/if}
   </div>
 {:else if appStore.state.activeTab === 'abilities'}
-  <div class="text-center py-12">
-    <div class="text-6xl mb-4">⚔️</div>
-    <h2 class="text-2xl font-bold mb-2">Habilidades</h2>
-    <p class="text-muted-foreground">Em desenvolvimento...</p>
-  </div>
+  <SkillsPanel />
 {:else if appStore.state.activeTab === 'items'}
   <div class="text-center py-12">
     <div class="text-6xl mb-4">🎒</div>
@@ -170,9 +191,5 @@
     <p class="text-muted-foreground">Em desenvolvimento...</p>
   </div>
 {:else if appStore.state.activeTab === 'spells'}
-  <div class="text-center py-12">
-    <div class="text-6xl mb-4">✨</div>
-    <h2 class="text-2xl font-bold mb-2">Magias</h2>
-    <p class="text-muted-foreground">Em desenvolvimento...</p>
-  </div>
+  <SpellManagement />
 {/if}
