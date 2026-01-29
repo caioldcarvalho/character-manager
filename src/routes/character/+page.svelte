@@ -16,6 +16,7 @@
     calculateSpellSaveDC,
     calculateSpellAttackBonus
   } from '$lib/utils/character';
+  import { Pencil, Backpack } from 'lucide-svelte';
 
   const abilities = [
     { key: 'strength', label: 'Força', abbr: 'FOR' },
@@ -68,7 +69,7 @@
               {character.name}
             </h1>
             <button onclick={startEdit} class="text-muted-foreground hover:text-foreground transition-colors" aria-label="Editar nome">
-              ✏️
+              <Pencil size={18} />
             </button>
           {/if}
         </div>
@@ -228,9 +229,9 @@
 {:else if appStore.state.activeTab === 'abilities'}
   <SkillsPanel />
 {:else if appStore.state.activeTab === 'items'}
-  <div class="text-center py-12">
-    <div class="text-6xl mb-4">🎒</div>
-    <h2 class="text-2xl font-bold mb-2">Itens</h2>
+  <div class="flex flex-col items-center justify-center py-12 text-center">
+    <div class="mb-4 text-muted-foreground/30"><Backpack size={64} /></div>
+    <h2 class="text-2xl font-bold mb-2 text-foreground">Itens</h2>
     <p class="text-muted-foreground">Em desenvolvimento...</p>
   </div>
 {:else if appStore.state.activeTab === 'spells'}

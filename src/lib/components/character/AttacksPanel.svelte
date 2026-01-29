@@ -6,6 +6,7 @@
     calculateWeaponDamageBonus,
     formatDamageRoll
   } from '$lib/utils/character';
+  import { Sword, Trash2, Dices, Swords } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -221,14 +222,14 @@
                   class="px-2 py-1 text-xs bg-secondary hover:bg-secondary/80 rounded transition-colors"
                   title="Desequipar"
                 >
-                  ⚔️
+                  <Sword size={14} />
                 </button>
                 <button
                   onclick={() => removeWeapon(weapon.id)}
                   class="px-2 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors"
                   title="Remover"
                 >
-                  🗑️
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
@@ -236,9 +237,9 @@
             <div class="flex items-center gap-3">
               <button
                 onclick={() => rollAttack(weapon.id, attackBonus, damageRoll)}
-                class="px-3 py-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded text-sm font-semibold transition-colors"
+                class="px-3 py-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded text-sm font-semibold transition-colors flex items-center gap-2"
               >
-                🎲 Ataque: +{attackBonus}
+                <Dices size={16} /> Ataque: +{attackBonus}
               </button>
               <div class="text-sm">
                 <span class="font-medium">Dano:</span> {damageRoll} {weapon.damageType}
@@ -275,7 +276,7 @@
                 class="px-2 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors"
                 title="Remover"
               >
-                🗑️
+                <Trash2 size={14} />
               </button>
             </div>
           </div>
@@ -304,7 +305,8 @@
     {/if}
 
     {#if weaponAttacks().length === 0 && character.weapons.length === 0}
-      <div class="p-4 bg-muted/50 rounded-lg text-center">
+      <div class="p-4 bg-muted/50 rounded-lg text-center flex flex-col items-center">
+        <Swords size={48} class="mb-2 text-muted-foreground/30" />
         <p class="text-sm text-muted-foreground">
           Nenhuma arma adicionada. Clique em "Adicionar Arma" para começar.
         </p>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
+  import { Moon, Zap } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -29,9 +30,9 @@
       <h2 class="text-xl font-bold">Espaços de Magia</h2>
       <button
         onclick={longRest}
-        class="px-3 py-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-sm font-semibold transition-colors"
+        class="px-3 py-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-sm font-semibold transition-colors flex items-center gap-2"
       >
-        ⭐ Descanso Longo
+        <Moon size={16} /> Descanso Longo
       </button>
     </div>
 
@@ -48,13 +49,13 @@
           {#each Array(character.spellSlots.level1.max) as _, i}
             <button
               onclick={() => toggleSlot(1, i)}
-              class="w-10 h-10 rounded-full border-2 transition-all {i < character.spellSlots.level1.current
+              class="w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center {i < character.spellSlots.level1.current
                 ? 'bg-primary border-primary'
                 : 'bg-transparent border-muted-foreground/30 hover:border-muted-foreground'}"
               aria-label="Espaço de magia nível 1 {i + 1}"
             >
               {#if i < character.spellSlots.level1.current}
-                <div class="text-primary-foreground font-bold">•</div>
+                <div class="text-primary-foreground font-bold">I</div>
               {/if}
             </button>
           {/each}
@@ -73,13 +74,13 @@
           {#each Array(character.spellSlots.level2.max) as _, i}
             <button
               onclick={() => toggleSlot(2, i)}
-              class="w-10 h-10 rounded-full border-2 transition-all {i < character.spellSlots.level2.current
+              class="w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center {i < character.spellSlots.level2.current
                 ? 'bg-purple-500 border-purple-500'
                 : 'bg-transparent border-muted-foreground/30 hover:border-muted-foreground'}"
               aria-label="Espaço de magia nível 2 {i + 1}"
             >
               {#if i < character.spellSlots.level2.current}
-                <div class="text-white font-bold">••</div>
+                <div class="text-white font-bold">II</div>
               {/if}
             </button>
           {/each}

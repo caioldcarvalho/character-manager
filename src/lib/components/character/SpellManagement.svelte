@@ -7,6 +7,7 @@
     calculateSpellAttackBonus,
     formatModifier
   } from '$lib/utils/character';
+  import { ChevronDown, ChevronRight, Check } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -165,19 +166,7 @@
                       aria-label="Preparar {spell.name}"
                     >
                       {#if prepared}
-                        <svg
-                          class="w-4 h-4 text-primary-foreground"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="3"
-                            d="M5 13l4 4L19 7"
-                          ></path>
-                        </svg>
+                        <Check size={16} class="text-primary-foreground" />
                       {/if}
                     </button>
 
@@ -197,7 +186,11 @@
                       onclick={() => toggleExpanded(spell.name)}
                       class="text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {expandedSpells.has(spell.name) ? '▼' : '▶'}
+                      {#if expandedSpells.has(spell.name)}
+                        <ChevronDown size={20} />
+                      {:else}
+                        <ChevronRight size={20} />
+                      {/if}
                     </button>
                   </div>
 

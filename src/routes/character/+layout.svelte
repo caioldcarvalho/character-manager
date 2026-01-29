@@ -5,14 +5,19 @@
   import Button from '$lib/components/ui/button.svelte';
   import { appStore } from '$lib/stores/app.svelte';
   import { goto } from '$app/navigation';
+  import { 
+    ClipboardList, Swords, Backpack, Sparkles, 
+    User, PlusCircle, Dices, ChevronDown, Check,
+    PanelLeftClose, PanelLeftOpen 
+  } from 'lucide-svelte';
 
   let { children } = $props();
 
   const tabs = [
-    { id: 'summary', label: 'Resumo', icon: '📋' },
-    { id: 'abilities', label: 'Habilidades', icon: '⚔️' },
-    { id: 'items', label: 'Itens', icon: '🎒' },
-    { id: 'spells', label: 'Magias', icon: '✨' }
+    { id: 'summary', label: 'Resumo', icon: ClipboardList },
+    { id: 'abilities', label: 'Habilidades', icon: Swords },
+    { id: 'items', label: 'Itens', icon: Backpack },
+    { id: 'spells', label: 'Magias', icon: Sparkles }
   ];
 
   let dropdownOpen = $state(false);
@@ -39,10 +44,10 @@
       <Dropdown bind:open={dropdownOpen}>
         {#snippet trigger()}
           <div
-            class="flex items-center justify-between px-4 py-3 bg-secondary rounded-lg hover:bg-hover transition-colors"
+            class="flex items-center justify-between px-4 py-3 bg-secondary rounded-lg hover:bg-hover transition-colors cursor-pointer"
           >
             <div class="flex items-center space-x-2 overflow-hidden">
-              <span class="text-lg">👤</span>
+              <span class="text-lg"><User size={20} /></span>
               {#if appStore.state.sidebarOpen}
                 <div class="flex-1 min-w-0">
                   {#if appStore.activeCharacter}
@@ -57,19 +62,9 @@
               {/if}
             </div>
             {#if appStore.state.sidebarOpen}
-              <svg
-                class="w-4 h-4 transition-transform {dropdownOpen ? 'rotate-180' : ''}"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              <div class="transition-transform {dropdownOpen ? 'rotate-180' : ''}">
+                <ChevronDown size={16} />
+              </div>
             {/if}
           </div>
         {/snippet}
@@ -87,7 +82,7 @@
                   onclick={() => selectCharacter(char.id)}
                   class="w-full text-left px-4 py-2 hover:bg-hover transition-colors flex items-center space-x-3"
                 >
-                  <span class="text-lg">👤</span>
+                  <span class="text-lg"><User size={18} /></span>
                   <div class="flex-1">
                     <div class="font-medium">{char.name}</div>
                     <div class="text-xs text-muted-foreground">
@@ -95,13 +90,7 @@
                     </div>
                   </div>
                   {#if appStore.state.activeCharacterId === char.id}
-                    <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
+                    <Check size={16} class="text-primary" />
                   {/if}
                 </button>
               {/each}
@@ -113,10 +102,10 @@
       <!-- Botão criar novo personagem -->
       <Button
         onclick={handleNewCharacter}
-        class="w-full justify-start"
+        class="w-full justify-start flex items-center"
         variant="secondary"
       >
-        <span class="text-lg mr-2">➕</span>
+        <span class="mr-2"><PlusCircle size={20} /></span>
         {#if appStore.state.sidebarOpen}
           Criar Novo Personagem
         {/if}
@@ -130,19 +119,11 @@
         onclick={() => appStore.toggleSidebar()}
         class="w-full p-2 hover:bg-hover rounded-lg transition-colors flex items-center justify-center"
       >
-        <svg
-          class="w-5 h-5 transition-transform {appStore.state.sidebarOpen ? '' : 'rotate-180'}"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-          />
-        </svg>
+        {#if appStore.state.sidebarOpen}
+          <PanelLeftClose size={20} />
+        {:else}
+          <PanelLeftOpen size={20} />
+        {/if}
       </button>
     </div>
   </Sidebar>
@@ -162,8 +143,8 @@
       </div>
     {:else}
       <div class="flex items-center justify-center h-screen">
-        <div class="text-center space-y-4">
-          <div class="text-6xl">🎲</div>
+        <div class="text-center space-y-4 flex flex-col items-center">
+          <div class="text-6xl text-muted-foreground/30"><Dices size={64} /></div>
           <h2 class="text-2xl font-bold">Nenhum personagem selecionado</h2>
           <p class="text-muted-foreground">Selecione um personagem ou crie um novo</p>
           <Button onclick={handleNewCharacter}>

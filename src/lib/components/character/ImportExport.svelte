@@ -1,5 +1,6 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
+  import { Download, Upload } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -59,16 +60,16 @@
   <button
     onclick={exportCharacter}
     disabled={!character}
-    class="px-4 py-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground rounded-md font-semibold transition-colors"
+    class="px-4 py-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground rounded-md font-semibold transition-colors flex items-center gap-2"
   >
-    📥 Exportar JSON
+    <Download size={18} /> Exportar JSON
   </button>
 
   <button
     onclick={triggerImport}
-    class="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-input text-foreground rounded-md font-semibold transition-colors"
+    class="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-input text-foreground rounded-md font-semibold transition-colors flex items-center gap-2"
   >
-    📤 Importar JSON
+    <Upload size={18} /> Importar JSON
   </button>
 
   <input

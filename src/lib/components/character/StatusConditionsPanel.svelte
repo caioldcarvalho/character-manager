@@ -2,11 +2,33 @@
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import { DND_CONDITIONS } from '$lib/constants/dnd';
+  import { 
+    EyeOff, VolumeX, ShieldAlert, Hand, Ban, Ghost, 
+    PauseOctagon, Box, Skull, ArrowDown, Lock, Zap, 
+    Moon, BatteryLow, Info
+  } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
   const activeCount = $derived(character?.statusConditions.length || 0);
 
   let expandedConditions = $state<Set<string>>(new Set());
+
+  const CONDITION_ICONS: Record<string, any> = {
+    'Cego': EyeOff,
+    'Surdo': VolumeX,
+    'Amedrontado': ShieldAlert,
+    'Agarrado': Hand,
+    'Incapacitado': Ban,
+    'Invisível': Ghost,
+    'Paralisado': PauseOctagon,
+    'Petrificado': Box,
+    'Envenenado': Skull,
+    'Caído': ArrowDown,
+    'Contido': Lock,
+    'Atordoado': Zap,
+    'Inconsciente': Moon,
+    'Exausto': BatteryLow
+  };
 
   function toggleCondition(name: string) {
     if (character) {
@@ -59,6 +81,7 @@
       {#each DND_CONDITIONS as condition}
         {@const active = isActive(condition.name)}
         {@const expanded = expandedConditions.has(condition.name)}
+        {@const Icon = CONDITION_ICONS[condition.name] || Info}
 
         <div class="border rounded-lg overflow-hidden {active ? 'border-red-500 bg-red-500/10' : 'border-border'}">
           <div class="flex items-center justify-between p-3 {active ? 'bg-red-500/20' : 'bg-background'}">
@@ -66,7 +89,9 @@
               onclick={() => toggleCondition(condition.name)}
               class="flex-1 flex items-center gap-2 text-left hover:opacity-80 transition-opacity"
             >
-              <span class="text-2xl">{condition.icon}</span>
+              <span class="text-2xl text-foreground">
+                 <Icon size={24} />
+              </span>
               <span class="font-semibold text-sm {active ? 'text-red-400' : ''}">{condition.name}</span>
             </button>
             <button
@@ -74,7 +99,7 @@
               class="text-muted-foreground hover:text-foreground transition-colors px-2"
               aria-label="Informações sobre {condition.name}"
             >
-              ℹ️
+              <Info size={16} />
             </button>
           </div>
 
@@ -99,9 +124,10 @@
         <div class="flex flex-wrap gap-2">
           {#each character.statusConditions as conditionName}
             {@const condition = DND_CONDITIONS.find(c => c.name === conditionName)}
+            {@const Icon = CONDITION_ICONS[conditionName] || Info}
             {#if condition}
               <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-sm flex items-center gap-1">
-                {condition.icon} {condition.name}
+                <Icon size={16} /> {condition.name}
               </span>
             {/if}
           {/each}
