@@ -13,7 +13,7 @@
     character ? (character.hitPoints.current / character.hitPoints.max) * 100 : 0
   );
   const hpColor = $derived(
-    hpPercentage > 50 ? 'bg-green-500' : hpPercentage > 25 ? 'bg-yellow-500' : 'bg-red-500'
+    hpPercentage > 50 ? 'bg-success' : hpPercentage > 25 ? 'bg-warning' : 'bg-danger'
   );
 
   function handleTakeDamage() {
@@ -39,7 +39,7 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <h2 class="text-xl font-bold mb-4">Pontos de Vida</h2>
 
     <!-- Current/Max HP Display -->
@@ -57,7 +57,7 @@
     <div class="mb-6">
       <div class="w-full bg-secondary rounded-full h-4 overflow-hidden">
         <div
-          class="{hpColor} h-full transition-all duration-300"
+          class="{hpColor} h-full transition-all duration-300 bg-gradient-to-r"
           style="width: {hpPercentage}%"
         ></div>
       </div>
@@ -65,14 +65,14 @@
 
     <!-- Temporary HP -->
     {#if character.hitPoints.temporary > 0}
-      <div class="mb-4 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
+      <div class="mb-4 p-3 bg-info/20 border border-info rounded-lg">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium">PV Temporários</span>
           <div class="flex items-center gap-2">
-            <span class="text-lg font-bold text-blue-400">+{character.hitPoints.temporary}</span>
+            <span class="text-lg font-bold text-info-light">+{character.hitPoints.temporary}</span>
             <button
               onclick={() => appStore.updateHP(character.id, character.hitPoints.current, 0)}
-              class="text-blue-400 hover:text-blue-300 transition-colors"
+              class="text-info-light hover:text-info transition-colors"
               aria-label="Remover PV Temporários"
             >
               <X size={20} />
@@ -94,7 +94,7 @@
         />
         <button
           onclick={handleTakeDamage}
-          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-semibold transition-colors"
+          class="px-4 py-2 bg-danger hover:bg-danger-dark text-danger-foreground rounded-md font-semibold transition-colors"
         >
           Receber Dano
         </button>
@@ -111,7 +111,7 @@
         />
         <button
           onclick={handleHeal}
-          class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-semibold transition-colors"
+          class="px-4 py-2 bg-success hover:bg-success-dark text-success-foreground rounded-md font-semibold transition-colors"
         >
           Curar
         </button>
@@ -128,7 +128,7 @@
         />
         <button
           onclick={handleSetTempHP}
-          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors"
+          class="px-4 py-2 bg-info hover:bg-info-dark text-info-foreground rounded-md font-semibold transition-colors"
         >
           Definir Temp
         </button>

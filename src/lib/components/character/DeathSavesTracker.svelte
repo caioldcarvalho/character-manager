@@ -36,9 +36,9 @@
 </script>
 
 {#if character && isDying}
-  <div class="mt-6 p-4 border-2 rounded-lg {isDead ? 'border-red-600 bg-red-500/10' : isStabilized ? 'border-green-600 bg-green-500/10' : 'border-yellow-600 bg-yellow-500/10'}">
+  <div class="mt-6 p-4 border-2 rounded-lg {isDead ? 'border-danger bg-danger/10' : isStabilized ? 'border-success bg-success/10' : 'border-warning bg-warning/10'}">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-lg font-bold flex items-center {isDead ? 'text-red-400' : isStabilized ? 'text-green-400' : 'text-yellow-400'}">
+      <h3 class="text-lg font-bold flex items-center {isDead ? 'text-danger-light' : isStabilized ? 'text-success-light' : 'text-warning-light'}">
         {#if isDead}
           <Skull size={20} class="mr-2" /> Morto
         {:else if isStabilized}
@@ -58,18 +58,18 @@
     <div class="space-y-3">
       <!-- Successes -->
       <div>
-        <div class="text-sm font-medium mb-2 text-green-400">Sucessos</div>
+        <div class="text-sm font-medium mb-2 text-success-light">Sucessos</div>
         <div class="flex gap-2">
           {#each [0, 1, 2] as index}
             <button
               onclick={() => toggleSuccess(index)}
               class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all {character.deathSaves.successes > index
-                ? 'bg-green-500 border-green-500'
-                : 'border-green-500/50 hover:border-green-500'}"
+                ? 'bg-success border-success'
+                : 'border-success/50 hover:border-success'}"
               aria-label="Sucesso {index + 1}"
             >
               {#if character.deathSaves.successes > index}
-                <span class="text-white font-bold"><Check size={16} /></span>
+                <span class="text-success-foreground font-bold"><Check size={16} /></span>
               {/if}
             </button>
           {/each}
@@ -78,18 +78,18 @@
 
       <!-- Failures -->
       <div>
-        <div class="text-sm font-medium mb-2 text-red-400">Falhas</div>
+        <div class="text-sm font-medium mb-2 text-danger-light">Falhas</div>
         <div class="flex gap-2">
           {#each [0, 1, 2] as index}
             <button
               onclick={() => toggleFailure(index)}
               class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all {character.deathSaves.failures > index
-                ? 'bg-red-500 border-red-500'
-                : 'border-red-500/50 hover:border-red-500'}"
+                ? 'bg-danger border-danger'
+                : 'border-danger/50 hover:border-danger'}"
               aria-label="Falha {index + 1}"
             >
               {#if character.deathSaves.failures > index}
-                <span class="text-white font-bold"><X size={16} /></span>
+                <span class="text-danger-foreground font-bold"><X size={16} /></span>
               {/if}
             </button>
           {/each}

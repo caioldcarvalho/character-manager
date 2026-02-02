@@ -43,7 +43,7 @@
 
   {#if open}
     <div
-      class="absolute top-full left-0 mt-2 w-full bg-card border border-border rounded-md shadow-lg z-50 max-h-80 overflow-auto"
+      class="absolute top-full left-0 mt-2 w-full bg-[var(--glass-bg)] backdrop-blur-[var(--glass-blur)] text-card-foreground border border-[var(--glass-border)] rounded-md shadow-lg z-50 max-h-80 overflow-auto transition-[var(--transition-base)] animate-fade-in"
     >
       {@render content?.()}
     </div>

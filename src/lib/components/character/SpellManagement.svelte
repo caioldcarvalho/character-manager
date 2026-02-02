@@ -77,7 +77,7 @@
 {#if character}
   <div class="space-y-6">
     <!-- Spell Casting Stats -->
-    <Card class="p-6">
+    <Card variant="glass" class="p-6 animate-fade-in">
       <h2 class="text-xl font-bold mb-4">Conjuração</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -124,7 +124,7 @@
         </div>
         <div class="w-full bg-secondary rounded-full h-2">
           <div
-            class="bg-purple-500 h-full rounded-full transition-all"
+            class="bg-magic h-full rounded-full transition-all"
             style="width: {(character.spellSlots.level2.current / character.spellSlots.level2.max) * 100}%"
           ></div>
         </div>
@@ -132,7 +132,7 @@
     </Card>
 
     <!-- Spell List -->
-    <Card class="p-6">
+    <Card variant="glass" class="p-6 animate-fade-in">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold">Magias Conhecidas</h2>
 

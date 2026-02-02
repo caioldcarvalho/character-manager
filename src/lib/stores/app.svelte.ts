@@ -26,6 +26,9 @@ function migrateCharacter(char: any): Character {
   const level = char.level || 5;
   const proficiencyBonus = getProficiencyBonus(level);
 
+  // Get hit dice type from class
+  const hitDiceType = char.class?.hit_die || 10;
+
   return {
     ...char,
     hitPoints: char.hitPoints || { current: 40, max: 40, temporary: 0 },
@@ -50,7 +53,25 @@ function migrateCharacter(char: any): Character {
     },
     weapons: char.weapons || [],
     statusConditions: char.statusConditions || [],
-    deathSaves: char.deathSaves || { successes: 0, failures: 0, stabilized: false }
+    deathSaves: char.deathSaves || { successes: 0, failures: 0, stabilized: false },
+
+    // New fields with defaults
+    notes: char.notes || [],
+    hitDice: char.hitDice || {
+      current: level,
+      max: level,
+      type: hitDiceType
+    },
+    restResources: char.restResources || {
+      lastShortRest: undefined,
+      lastLongRest: undefined
+    },
+    inspiration: char.inspiration || false,
+
+    // Future fields (optional)
+    inventory: char.inventory || undefined,
+    currency: char.currency || undefined,
+    cantrips: char.cantrips || undefined
   };
 }
 
@@ -372,6 +393,122 @@ function createAppStore() {
       const char = state.characters.find(c => c.id === id);
       if (!char) return;
       char.deathSaves = { successes: 0, failures: 0, stabilized: false };
+      this.saveToLocalStorage();
+    },
+
+    // Note management
+    addNote(characterId: string, note: import('$lib/types').Note) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+
+      char.notes = [...(char.notes || []), note];
+      char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    updateNote(characterId: string, noteId: string, updates: Partial<import('$lib/types').Note>) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+
+      char.notes = char.notes.map(note =>
+        note.id === noteId
+          ? { ...note, ...updates, updatedAt: new Date().toISOString() }
+          : note
+      );
+      char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    deleteNote(characterId: string, noteId: string) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+
+      char.notes = char.notes.filter(note => note.id !== noteId);
+      char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    toggleNotePin(characterId: string, noteId: string) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+
+      char.notes = char.notes.map(note =>
+        note.id === noteId
+          ? { ...note, pinned: !note.pinned, updatedAt: new Date().toISOString() }
+          : note
+      );
+      this.saveToLocalStorage();
+    },
+
+    // Rest management
+    shortRest(characterId: string, diceSpent: number, healing: number) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+
+      // Heal HP
+      char.hitPoints.current = Math.min(
+        char.hitPoints.current + healing,
+        char.hitPoints.max
+      );
+
+      // Spend hit dice
+      char.hitDice.current = Math.max(0, char.hitDice.current - diceSpent);
+
+      // Update timestamp
+      char.restResources.lastShortRest = new Date().toISOString();
+
+      char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    longRest(characterId: string) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+
+      // Restore HP
+      char.hitPoints.current = char.hitPoints.max;
+      char.hitPoints.temporary = 0;
+
+      // Restore spell slots
+      Object.keys(char.spellSlots).forEach(key => {
+        const slotKey = key as keyof typeof char.spellSlots;
+        char.spellSlots[slotKey].current = char.spellSlots[slotKey].max;
+      });
+
+      // Restore hit dice (half, min 1)
+      const diceRestored = Math.max(1, Math.floor(char.hitDice.max / 2));
+      char.hitDice.current = Math.min(
+        char.hitDice.current + diceRestored,
+        char.hitDice.max
+      );
+
+      // Restore class features
+      if (char.paladinResources) {
+        char.paladinResources.layOnHands.current = char.paladinResources.layOnHands.max;
+        char.paladinResources.channelDivinity.current = char.paladinResources.channelDivinity.max;
+      }
+
+      char.classFeatures.forEach(feature => {
+        if (feature.uses) {
+          feature.uses.current = feature.uses.max;
+        }
+      });
+
+      // Reset death saves
+      char.deathSaves = { successes: 0, failures: 0, stabilized: false };
+
+      // Update timestamp
+      char.restResources.lastLongRest = new Date().toISOString();
+
+      char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    toggleInspiration(characterId: string) {
+      const char = state.characters.find(c => c.id === characterId);
+      if (!char) return;
+      char.inspiration = !char.inspiration;
+      char.updatedAt = new Date();
       this.saveToLocalStorage();
     }
   };

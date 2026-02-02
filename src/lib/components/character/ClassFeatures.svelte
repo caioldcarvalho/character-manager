@@ -24,7 +24,7 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <h2 class="text-xl font-bold mb-4">Características de Classe</h2>
 
     <!-- Fighting Style -->
@@ -46,7 +46,7 @@
         </div>
         <div class="w-full bg-background rounded-full h-2 overflow-hidden">
           <div
-            class="bg-green-500 h-full transition-all"
+            class="bg-success h-full transition-all"
             style="width: {(character.paladinResources.layOnHands.current / character.paladinResources.layOnHands.max) * 100}%"
           ></div>
         </div>
@@ -63,7 +63,7 @@
         <div class="flex gap-1">
           {#each Array(character.paladinResources.channelDivinity.max) as _, i}
             <div
-              class="flex-1 h-2 rounded-full {i < character.paladinResources.channelDivinity.current ? 'bg-yellow-500' : 'bg-background'}"
+              class="flex-1 h-2 rounded-full {i < character.paladinResources.channelDivinity.current ? 'bg-warning' : 'bg-background'}"
             ></div>
           {/each}
         </div>

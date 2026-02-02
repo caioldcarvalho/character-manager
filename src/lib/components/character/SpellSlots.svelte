@@ -25,7 +25,7 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold">Espaços de Magia</h2>
       <button
@@ -75,12 +75,12 @@
             <button
               onclick={() => toggleSlot(2, i)}
               class="w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center {i < character.spellSlots.level2.current
-                ? 'bg-purple-500 border-purple-500'
+                ? 'bg-magic border-magic'
                 : 'bg-transparent border-muted-foreground/30 hover:border-muted-foreground'}"
               aria-label="Espaço de magia nível 2 {i + 1}"
             >
               {#if i < character.spellSlots.level2.current}
-                <div class="text-white font-bold">II</div>
+                <div class="text-magic-foreground font-bold">II</div>
               {/if}
             </button>
           {/each}

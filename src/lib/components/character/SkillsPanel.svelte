@@ -45,7 +45,7 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <h2 class="text-xl font-bold mb-4">Perícias</h2>
 
     <div class="space-y-6">

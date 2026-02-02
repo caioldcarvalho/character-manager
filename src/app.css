@@ -41,8 +41,62 @@
   /* Hover states */
   --color-hover: #1f1f1f;
 
+  /* Semantic Colors - Saúde & Sucesso (Verde) */
+  --color-success: #22c55e;
+  --color-success-foreground: #ffffff;
+  --color-success-light: #86efac;
+  --color-success-dark: #15803d;
+
+  /* Semantic Colors - Perigo & Dano (Vermelho) */
+  --color-danger: #ef4444;
+  --color-danger-foreground: #ffffff;
+  --color-danger-light: #fca5a5;
+  --color-danger-dark: #991b1b;
+
+  /* Semantic Colors - Info & Temporário (Azul) */
+  --color-info: #3b82f6;
+  --color-info-foreground: #ffffff;
+  --color-info-light: #93c5fd;
+  --color-info-dark: #1e40af;
+
+  /* Semantic Colors - Magia & Feitiços (Roxo) */
+  --color-magic: #a855f7;
+  --color-magic-foreground: #ffffff;
+  --color-magic-light: #d8b4fe;
+  --color-magic-dark: #7c3aed;
+
+  /* Semantic Colors - Aviso (Amarelo) */
+  --color-warning: #eab308;
+  --color-warning-foreground: #000000;
+  --color-warning-light: #fde047;
+  --color-warning-dark: #a16207;
+
+  /* Semantic Colors - Neutro (Cinza) */
+  --color-neutral: #64748b;
+  --color-neutral-foreground: #ffffff;
+  --color-neutral-light: #cbd5e1;
+  --color-neutral-dark: #334155;
+
   /* Border radius */
   --radius: 0.5rem;
+
+  /* Glassmorphism - Subtle variant */
+  --glass-bg: rgba(26, 26, 26, 0.85);
+  --glass-bg-light: rgba(26, 26, 26, 0.6);
+  --glass-border: rgba(196, 30, 30, 0.15);
+  --glass-blur: 10px;
+
+  /* Gradients - Subtle accents */
+  --gradient-primary: linear-gradient(135deg, #c41e1e 0%, #8b0000 100%);
+  --gradient-magic: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  --gradient-success: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+
+  /* Glow effects - Subtle */
+  --glow-primary-subtle: 0 0 15px rgba(196, 30, 30, 0.3);
+  --glow-focus: 0 0 0 3px rgba(196, 30, 30, 0.2);
+
+  /* Smooth transitions */
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Scrollbar personalizada */
@@ -61,4 +115,34 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary);
+  box-shadow: var(--glow-primary-subtle);
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtle-glow-pulse {
+  0%, 100% {
+    box-shadow: var(--glow-primary-subtle);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(196, 30, 30, 0.4);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.animate-subtle-glow-pulse {
+  animation: subtle-glow-pulse 2s ease-in-out infinite;
 }

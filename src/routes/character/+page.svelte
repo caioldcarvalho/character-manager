@@ -10,11 +10,14 @@
   import SpellManagement from '$lib/components/character/SpellManagement.svelte';
   import AttacksPanel from '$lib/components/character/AttacksPanel.svelte';
   import StatusConditionsPanel from '$lib/components/character/StatusConditionsPanel.svelte';
+  import NotesPanel from '$lib/components/character/NotesPanel.svelte';
+  import RestManager from '$lib/components/character/RestManager.svelte';
   import {
     getFinalAbilityScore,
     formatModifier,
     calculateSpellSaveDC,
-    calculateSpellAttackBonus
+    calculateSpellAttackBonus,
+    calculateInitiative
   } from '$lib/utils/character';
   import { Pencil, Backpack } from 'lucide-svelte';
 
@@ -61,11 +64,11 @@
               bind:value={nameInput}
               onblur={saveName}
               onkeydown={(e) => e.key === 'Enter' && saveName()}
-              class="text-3xl font-bold bg-background border-b-2 border-primary focus:outline-none min-w-[200px]"
+              class="text-3xl font-bold bg-background text-foreground border-b-2 border-primary focus:outline-none min-w-[200px]"
               autofocus
             />
           {:else}
-            <h1 class="text-3xl font-bold cursor-pointer hover:text-primary transition-colors" onclick={startEdit}>
+            <h1 class="text-3xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onclick={startEdit}>
               {character.name}
             </h1>
             <button onclick={startEdit} class="text-muted-foreground hover:text-foreground transition-colors" aria-label="Editar nome">
@@ -83,10 +86,10 @@
     <!-- Combat Stats Row -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <HPTracker />
-      <InitiativeTracker />
+      <RestManager />
 
       <!-- Spell Stats Card -->
-      <Card class="p-6">
+      <Card variant="glass" class="p-6 animate-fade-in">
         <h2 class="text-xl font-bold mb-4">Magia</h2>
         <div class="space-y-4">
           <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
@@ -107,8 +110,34 @@
       </Card>
     </div>
 
+    <!-- Compact Initiative Tracker -->
+    <Card variant="glass" class="p-4 animate-fade-in">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div>
+            <span class="text-sm text-muted-foreground">Iniciativa</span>
+            <div class="text-2xl font-bold">{formatModifier(getFinalAbilityScore(character, 'dexterity'))}</div>
+          </div>
+        </div>
+        <button
+          onclick={() => {
+            const initiativeMod = calculateInitiative(character);
+            const d20 = Math.floor(Math.random() * 20) + 1;
+            const result = d20 + initiativeMod;
+            alert(`Iniciativa: ${result} (d20: ${d20} ${formatModifier(getFinalAbilityScore(character, 'dexterity'))})`);
+          }}
+          class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-semibold transition-[var(--transition-base)] hover:scale-[1.02]"
+        >
+          Rolar
+        </button>
+      </div>
+    </Card>
+
     <!-- Ability Scores Row -->
-    <Card class="p-6">
+    <Card variant="glass" class="p-6 animate-fade-in">
       <h2 class="text-xl font-bold mb-4">Atributos</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {#each abilities as ability}
@@ -234,6 +263,8 @@
     <h2 class="text-2xl font-bold mb-2 text-foreground">Itens</h2>
     <p class="text-muted-foreground">Em desenvolvimento...</p>
   </div>
+{:else if appStore.state.activeTab === 'notes'}
+  <NotesPanel />
 {:else if appStore.state.activeTab === 'spells'}
   <SpellManagement />
 {/if}

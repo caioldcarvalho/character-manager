@@ -16,7 +16,7 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <h2 class="text-xl font-bold mb-4">Iniciativa</h2>
 
     <!-- Initiative Modifier Display -->

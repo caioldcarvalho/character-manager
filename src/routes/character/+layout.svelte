@@ -5,10 +5,10 @@
   import Button from '$lib/components/ui/button.svelte';
   import { appStore } from '$lib/stores/app.svelte';
   import { goto } from '$app/navigation';
-  import { 
-    ClipboardList, Swords, Backpack, Sparkles, 
+  import {
+    ClipboardList, Swords, Backpack, Sparkles, BookText,
     User, PlusCircle, Dices, ChevronDown, Check,
-    PanelLeftClose, PanelLeftOpen 
+    PanelLeftClose, PanelLeftOpen
   } from 'lucide-svelte';
 
   let { children } = $props();
@@ -17,6 +17,7 @@
     { id: 'summary', label: 'Resumo', icon: ClipboardList },
     { id: 'abilities', label: 'Habilidades', icon: Swords },
     { id: 'items', label: 'Itens', icon: Backpack },
+    { id: 'notes', label: 'Notas', icon: BookText },
     { id: 'spells', label: 'Magias', icon: Sparkles }
   ];
 

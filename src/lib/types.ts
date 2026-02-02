@@ -82,6 +82,51 @@ export interface DeathSaves {
   stabilized: boolean;
 }
 
+// Notes
+export interface Note {
+  id: string;
+  title: string;
+  content: string;  // Plain text for v1
+  category: 'general' | 'quest' | 'npc' | 'location' | 'lore' | 'combat';
+  createdAt: string;  // ISO date string for localStorage
+  updatedAt: string;
+  pinned: boolean;
+}
+
+// Hit Dice
+export interface HitDice {
+  current: number;  // Remaining hit dice
+  max: number;      // Equal to character level
+  type: number;     // Die type (10 for Paladin, varies by class)
+}
+
+// Rest Resources
+export interface RestResources {
+  lastShortRest?: string;  // ISO timestamp
+  lastLongRest?: string;
+}
+
+// Inventory
+export interface InventoryItem {
+  id: string;
+  name: string;
+  quantity: number;
+  weight: number;
+  description: string;
+  type: 'weapon' | 'armor' | 'equipment' | 'consumable' | 'treasure' | 'other';
+  equipped: boolean;
+  attuned?: boolean;
+  notes?: string;
+}
+
+// Currency
+export interface Currency {
+  platinum: number;
+  gold: number;
+  silver: number;
+  copper: number;
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -103,6 +148,17 @@ export interface Character {
   weapons: Weapon[];
   statusConditions: string[];
   deathSaves: DeathSaves;
+
+  // New fields
+  notes: Note[];
+  hitDice: HitDice;
+  restResources: RestResources;
+  inspiration: boolean;
+
+  // Future: Phase 4
+  inventory?: InventoryItem[];
+  currency?: Currency;
+  cantrips?: string[];
 }
 
 export interface APIReference {

@@ -84,8 +84,8 @@
 {#if message}
   <div
     class="mt-2 p-3 rounded-lg {message.type === 'success'
-      ? 'bg-green-500/20 border border-green-500 text-green-400'
-      : 'bg-red-500/20 border border-red-500 text-red-400'}"
+      ? 'bg-success/20 border border-success text-success-light'
+      : 'bg-danger/20 border border-danger text-danger-light'}"
   >
     {message.text}
   </div>

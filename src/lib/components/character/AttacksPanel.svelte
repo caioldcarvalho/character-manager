@@ -102,7 +102,7 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold">Ataques</h2>
       <button
@@ -190,7 +190,7 @@
         <button
           onclick={addWeapon}
           disabled={!newWeapon.name.trim()}
-          class="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded font-semibold transition-colors w-full"
+          class="mt-3 px-4 py-2 bg-success hover:bg-success-dark disabled:bg-neutral-dark disabled:cursor-not-allowed text-success-foreground rounded font-semibold transition-colors w-full"
         >
           Adicionar Arma
         </button>
@@ -226,7 +226,7 @@
                 </button>
                 <button
                   onclick={() => removeWeapon(weapon.id)}
-                  class="px-2 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors"
+                  class="px-2 py-1 text-xs bg-danger/20 hover:bg-danger/30 text-danger-light rounded transition-colors"
                   title="Remover"
                 >
                   <Trash2 size={14} />
@@ -273,7 +273,7 @@
               </button>
               <button
                 onclick={() => removeWeapon(weapon.id)}
-                class="px-2 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors"
+                class="px-2 py-1 text-xs bg-danger/20 hover:bg-danger/30 text-danger-light rounded transition-colors"
                 title="Remover"
               >
                 <Trash2 size={14} />
@@ -289,13 +289,13 @@
       <div class="mt-6 space-y-2">
         <h3 class="text-sm font-bold text-foreground/70 uppercase">Magias de Dano Preparadas</h3>
         {#each damageSpells() as spell}
-          <div class="p-2 border border-purple-500/30 rounded bg-purple-500/10">
+          <div class="p-2 border border-magic/30 rounded bg-magic/10">
             <div class="flex items-center justify-between">
               <div>
                 <span class="font-semibold text-sm">{spell.name}</span>
                 <span class="text-xs text-muted-foreground ml-2">Nível {spell.level}</span>
               </div>
-              <div class="text-xs text-purple-400">
+              <div class="text-xs text-magic-light">
                 {spell.castingTime}
               </div>
             </div>

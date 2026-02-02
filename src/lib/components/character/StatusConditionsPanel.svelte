@@ -57,12 +57,12 @@
 </script>
 
 {#if character}
-  <Card class="p-6">
+  <Card variant="glass" class="p-6 animate-fade-in">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
         <h2 class="text-xl font-bold">Condições</h2>
         {#if activeCount > 0}
-          <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-bold">
+          <span class="px-2 py-1 bg-danger/20 text-danger-light rounded-full text-sm font-bold">
             {activeCount}
           </span>
         {/if}
@@ -83,8 +83,8 @@
         {@const expanded = expandedConditions.has(condition.name)}
         {@const Icon = CONDITION_ICONS[condition.name] || Info}
 
-        <div class="border rounded-lg overflow-hidden {active ? 'border-red-500 bg-red-500/10' : 'border-border'}">
-          <div class="flex items-center justify-between p-3 {active ? 'bg-red-500/20' : 'bg-background'}">
+        <div class="border rounded-lg overflow-hidden {active ? 'border-danger bg-danger/10' : 'border-border'}">
+          <div class="flex items-center justify-between p-3 {active ? 'bg-danger/20' : 'bg-background'}">
             <button
               onclick={() => toggleCondition(condition.name)}
               class="flex-1 flex items-center gap-2 text-left hover:opacity-80 transition-opacity"
@@ -92,7 +92,7 @@
               <span class="text-2xl text-foreground">
                  <Icon size={24} />
               </span>
-              <span class="font-semibold text-sm {active ? 'text-red-400' : ''}">{condition.name}</span>
+              <span class="font-semibold text-sm {active ? 'text-danger-light' : ''}">{condition.name}</span>
             </button>
             <button
               onclick={() => toggleExpanded(condition.name)}
@@ -119,14 +119,14 @@
         </p>
       </div>
     {:else}
-      <div class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-        <div class="text-sm font-semibold text-red-400 mb-1">Condições Ativas:</div>
+      <div class="mt-4 p-3 bg-danger/10 border border-danger/30 rounded-lg">
+        <div class="text-sm font-semibold text-danger-light mb-1">Condições Ativas:</div>
         <div class="flex flex-wrap gap-2">
           {#each character.statusConditions as conditionName}
             {@const condition = DND_CONDITIONS.find(c => c.name === conditionName)}
             {@const Icon = CONDITION_ICONS[conditionName] || Info}
             {#if condition}
-              <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-sm flex items-center gap-1">
+              <span class="px-2 py-1 bg-danger/20 text-danger-light rounded text-sm flex items-center gap-1">
                 <Icon size={16} /> {condition.name}
               </span>
             {/if}

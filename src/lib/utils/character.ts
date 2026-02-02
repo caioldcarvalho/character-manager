@@ -110,3 +110,38 @@ export function formatDamageRoll(dice: string, bonus: number): string {
   if (bonus === 0) return dice;
   return `${dice}${bonus >= 0 ? '+' : ''}${bonus}`;
 }
+
+// Generate unique ID
+export function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Format date
+export function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+// Get hit dice for class
+export function getHitDiceForClass(className: string): number {
+  const hitDice: Record<string, number> = {
+    'Barbarian': 12,
+    'Fighter': 10,
+    'Paladin': 10,
+    'Ranger': 10,
+    'Bard': 8,
+    'Cleric': 8,
+    'Druid': 8,
+    'Monk': 8,
+    'Rogue': 8,
+    'Warlock': 8,
+    'Sorcerer': 6,
+    'Wizard': 6
+  };
+  return hitDice[className] || 8;
+}
