@@ -1,6 +1,8 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
+  import ClassResourcesPanel from './ClassResourcesPanel.svelte';
+  import PsionicDice from './PsionicDice.svelte';
   import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
@@ -34,41 +36,49 @@
       </div>
     {/if}
 
-    <!-- Paladin Resources -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-      <!-- Lay on Hands -->
-      <div class="p-4 bg-secondary rounded-lg">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-bold">Cura pelas Mãos</span>
-          <span class="text-lg font-bold text-primary">
-            {character.paladinResources.layOnHands.current}/{character.paladinResources.layOnHands.max}
-          </span>
-        </div>
-        <div class="w-full bg-background rounded-full h-2 overflow-hidden">
-          <div
-            class="bg-success h-full transition-all"
-            style="width: {(character.paladinResources.layOnHands.current / character.paladinResources.layOnHands.max) * 100}%"
-          ></div>
-        </div>
-      </div>
-
-      <!-- Channel Divinity -->
-      <div class="p-4 bg-secondary rounded-lg">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-bold">Canalizar Divindade</span>
-          <span class="text-lg font-bold text-primary">
-            {character.paladinResources.channelDivinity.current}/{character.paladinResources.channelDivinity.max}
-          </span>
-        </div>
-        <div class="flex gap-1">
-          {#each Array(character.paladinResources.channelDivinity.max) as _, i}
+    <!-- Paladin Resources (Paladin only) -->
+    {#if character.class?.index === 'paladin'}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Lay on Hands -->
+        <div class="p-4 bg-secondary rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold">Cura pelas Mãos</span>
+            <span class="text-lg font-bold text-primary">
+              {character.paladinResources.layOnHands.current}/{character.paladinResources.layOnHands.max}
+            </span>
+          </div>
+          <div class="w-full bg-background rounded-full h-2 overflow-hidden">
             <div
-              class="flex-1 h-2 rounded-full {i < character.paladinResources.channelDivinity.current ? 'bg-warning' : 'bg-background'}"
+              class="bg-success h-full transition-all"
+              style="width: {(character.paladinResources.layOnHands.current / character.paladinResources.layOnHands.max) * 100}%"
             ></div>
-          {/each}
+          </div>
+        </div>
+
+        <!-- Channel Divinity -->
+        <div class="p-4 bg-secondary rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold">Canalizar Divindade</span>
+            <span class="text-lg font-bold text-primary">
+              {character.paladinResources.channelDivinity.current}/{character.paladinResources.channelDivinity.max}
+            </span>
+          </div>
+          <div class="flex gap-1">
+            {#each Array(character.paladinResources.channelDivinity.max) as _, i}
+              <div
+                class="flex-1 h-2 rounded-full {i < character.paladinResources.channelDivinity.current ? 'bg-warning' : 'bg-background'}"
+              ></div>
+            {/each}
+          </div>
         </div>
       </div>
-    </div>
+    {/if}
+
+    <!-- Generic Class Resources Panel -->
+    <ClassResourcesPanel />
+
+    <!-- Psionic Dice (Psi Warrior) -->
+    <PsionicDice />
 
     <!-- Class Features List -->
     <div class="space-y-2">

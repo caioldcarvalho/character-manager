@@ -56,6 +56,22 @@ export interface ClassFeature {
   uses?: { current: number; max: number };
 }
 
+// Generic class resource
+export interface ClassResource {
+  name: string;
+  current: number;
+  max: number;
+  rechargeOn: 'short' | 'long' | 'special';
+  description?: string;
+}
+
+// Psionic Dice for Psi Warrior
+export interface PsionicDice {
+  current: number;
+  max: number;  // 2 × proficiency bonus
+  dieSize: number;  // 6 at level 3, 8 at level 5, 10 at level 11
+}
+
 // Paladin resources
 export interface PaladinResources {
   layOnHands: { current: number; max: number };
@@ -145,6 +161,8 @@ export interface Character {
   classFeatures: ClassFeature[];
   fightingStyle: string;
   paladinResources: PaladinResources;
+  classResources: ClassResource[];
+  psionicDice?: PsionicDice;
   weapons: Weapon[];
   statusConditions: string[];
   deathSaves: DeathSaves;

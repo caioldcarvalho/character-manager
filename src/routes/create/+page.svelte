@@ -9,6 +9,7 @@
   import type { APIReference, Race, CharacterClass } from '$lib/types';
   import { goto } from '$app/navigation';
   import { createSamplePaladin } from '$lib/utils/sample-paladin';
+  import { createSamplePsiWarrior } from '$lib/utils/sample-psi-warrior';
   import { Upload, UserPlus } from 'lucide-svelte';
 
   let currentStep = $state(0);
@@ -221,6 +222,12 @@
     goto('/character');
   }
 
+  function loadSamplePsiWarrior() {
+    const psiWarrior = createSamplePsiWarrior();
+    appStore.addCharacter(psiWarrior);
+    goto('/character');
+  }
+
   let fileInput: HTMLInputElement;
   let importMessage = $state<{type: 'success' | 'error'; text: string} | null>(null);
 
@@ -262,6 +269,9 @@
         </Button>
         <Button onclick={loadSamplePaladin} variant="outline" class="flex items-center gap-2">
           <UserPlus size={16} /> Carregar Paladino de Teste
+        </Button>
+        <Button onclick={loadSamplePsiWarrior} variant="outline" class="flex items-center gap-2">
+          <UserPlus size={16} /> Criar Guerreiro Psi
         </Button>
       </div>
     </div>

@@ -24,7 +24,7 @@
   }
 </script>
 
-{#if character}
+{#if character && character.spellSlots.level1.max > 0}
   <Card variant="glass" class="p-6 animate-fade-in">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold">Espaços de Magia</h2>

@@ -13,13 +13,20 @@
 
   let { children } = $props();
 
-  const tabs = [
+  const allTabs = [
     { id: 'summary', label: 'Resumo', icon: ClipboardList },
     { id: 'abilities', label: 'Habilidades', icon: Swords },
     { id: 'items', label: 'Itens', icon: Backpack },
     { id: 'notes', label: 'Notas', icon: BookText },
     { id: 'spells', label: 'Magias', icon: Sparkles }
   ];
+
+  const character = $derived(appStore.activeCharacter);
+  const tabs = $derived(
+    character?.class?.index === 'fighter'
+      ? allTabs.filter(t => t.id !== 'spells')
+      : allTabs
+  );
 
   let dropdownOpen = $state(false);
 

@@ -51,6 +51,8 @@ function migrateCharacter(char: any): Character {
       layOnHands: { current: level * 5, max: level * 5 },
       channelDivinity: { current: 1, max: 1 }
     },
+    classResources: char.classResources || [],
+    psionicDice: char.psionicDice || undefined,
     weapons: char.weapons || [],
     statusConditions: char.statusConditions || [],
     deathSaves: char.deathSaves || { successes: 0, failures: 0, stabilized: false },
@@ -260,6 +262,37 @@ function createAppStore() {
       }
     },
 
+    useClassResource(id: string, resourceName: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+
+      const resource = char.classResources.find(r => r.name === resourceName);
+      if (resource && resource.current > 0) {
+        resource.current--;
+        this.saveToLocalStorage();
+      }
+    },
+
+    usePsionicDie(id: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.psionicDice) return;
+
+      if (char.psionicDice.current > 0) {
+        char.psionicDice.current--;
+        this.saveToLocalStorage();
+      }
+    },
+
+    recoverPsionicDie(id: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.psionicDice) return;
+
+      if (char.psionicDice.current < char.psionicDice.max) {
+        char.psionicDice.current++;
+        this.saveToLocalStorage();
+      }
+    },
+
     // Skills
     toggleSkillProficiency(id: string, skillKey: string) {
       const char = state.characters.find(c => c.id === id);
@@ -454,6 +487,13 @@ function createAppStore() {
       // Spend hit dice
       char.hitDice.current = Math.max(0, char.hitDice.current - diceSpent);
 
+      // Recover short-rest resources
+      char.classResources?.forEach(res => {
+        if (res.rechargeOn === 'short') {
+          res.current = res.max;
+        }
+      });
+
       // Update timestamp
       char.restResources.lastShortRest = new Date().toISOString();
 
@@ -493,6 +533,16 @@ function createAppStore() {
           feature.uses.current = feature.uses.max;
         }
       });
+
+      // Restore all class resources
+      char.classResources?.forEach(res => {
+        res.current = res.max;
+      });
+
+      // Restore all psionic dice
+      if (char.psionicDice) {
+        char.psionicDice.current = char.psionicDice.max;
+      }
 
       // Reset death saves
       char.deathSaves = { successes: 0, failures: 0, stabilized: false };
