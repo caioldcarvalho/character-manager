@@ -250,7 +250,7 @@
     <!-- Other Notes -->
     {#if unpinnedNotes.length > 0}
       <div>
-        <h3 class="text-lg font-bold mb-3">Outras Notas</h3>
+        <h3 class="text-lg font-bold mb-3 text-foreground">Outras Notas</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {#each unpinnedNotes as note (note.id)}
             <Card variant="glass" class="p-4 hover:border-primary/50 transition-all animate-fade-in">

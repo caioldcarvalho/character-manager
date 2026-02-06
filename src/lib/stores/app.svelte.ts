@@ -116,6 +116,13 @@ function createAppStore() {
         this.saveToLocalStorage();
       }
     },
+    replaceCharacter(id: string, newData: Character) {
+      const index = state.characters.findIndex(c => c.id === id);
+      if (index !== -1) {
+        state.characters[index] = migrateCharacter(newData);
+        this.saveToLocalStorage();
+      }
+    },
     deleteCharacter(id: string) {
       state.characters = state.characters.filter(c => c.id !== id);
       if (state.activeCharacterId === id) {

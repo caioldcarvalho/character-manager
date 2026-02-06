@@ -1,11 +1,13 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app.svelte';
-  import { Download, Upload } from 'lucide-svelte';
+  import { Download, Upload, Code } from 'lucide-svelte';
+  import JsonEditor from './JsonEditor.svelte';
 
   const character = $derived(appStore.activeCharacter);
 
   let fileInput: HTMLInputElement;
   let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
+  let jsonEditorOpen = $state(false);
 
   function exportCharacter() {
     if (!character) return;
@@ -66,6 +68,14 @@
   </button>
 
   <button
+    onclick={() => jsonEditorOpen = true}
+    disabled={!character}
+    class="px-4 py-2 bg-secondary hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed border border-input text-foreground rounded-md font-semibold transition-colors flex items-center gap-2"
+  >
+    <Code size={18} /> Editar JSON
+  </button>
+
+  <button
     onclick={triggerImport}
     class="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-input text-foreground rounded-md font-semibold transition-colors flex items-center gap-2"
   >
@@ -90,3 +100,5 @@
     {message.text}
   </div>
 {/if}
+
+<JsonEditor bind:open={jsonEditorOpen} />

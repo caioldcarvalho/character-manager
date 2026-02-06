@@ -257,8 +257,8 @@
   }
 </script>
 
-<div class="min-h-screen bg-background p-4">
-  <div class="container mx-auto max-w-4xl py-8">
+<div class="min-h-screen bg-mesh p-4">
+  <div class="container mx-auto max-w-4xl py-8 relative z-10">
     <div class="flex items-center justify-between mb-8">
       <h1 class="text-4xl font-bold text-foreground">
         Criador de Personagem D&D 5e

@@ -29,8 +29,8 @@
   }
 </script>
 
-<div class="min-h-screen bg-background p-6">
-  <div class="container mx-auto max-w-7xl">
+<div class="min-h-screen bg-mesh p-6">
+  <div class="container mx-auto max-w-7xl relative z-10">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>

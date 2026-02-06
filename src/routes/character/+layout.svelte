@@ -40,7 +40,11 @@
   }
 </script>
 
-<div class="flex min-h-screen bg-background">
+<svelte:head>
+  <title>{character ? `${character.name} | ${character.class?.name ?? ''} lvl ${character.level}` : 'D&D Manager'}</title>
+</svelte:head>
+
+<div class="flex min-h-screen bg-mesh">
   <!-- Sidebar -->
   <Sidebar bind:open={appStore.state.sidebarOpen}>
     <div class="p-4 border-b border-border">
@@ -55,11 +59,11 @@
             class="flex items-center justify-between px-4 py-3 bg-secondary rounded-lg hover:bg-hover transition-colors cursor-pointer"
           >
             <div class="flex items-center space-x-2 overflow-hidden">
-              <span class="text-lg"><User size={20} /></span>
+              <span class="text-lg text-foreground"><User size={20} /></span>
               {#if appStore.state.sidebarOpen}
                 <div class="flex-1 min-w-0">
                   {#if appStore.activeCharacter}
-                    <div class="font-semibold truncate">{appStore.activeCharacter.name}</div>
+                    <div class="font-semibold truncate text-foreground">{appStore.activeCharacter.name}</div>
                     <div class="text-xs text-muted-foreground">
                       Nível {appStore.activeCharacter.level}
                     </div>
@@ -71,7 +75,7 @@
             </div>
             {#if appStore.state.sidebarOpen}
               <div class="transition-transform {dropdownOpen ? 'rotate-180' : ''}">
-                <ChevronDown size={16} />
+                <ChevronDown class="text-foreground" size={16} />
               </div>
             {/if}
           </div>
@@ -138,7 +142,7 @@
 
   <!-- Main content -->
   <div
-    class="flex-1 transition-all duration-300"
+    class="flex-1 transition-all duration-300 relative z-10"
     style="margin-left: {appStore.state.sidebarOpen ? '16rem' : '4rem'}"
   >
     {#if appStore.activeCharacter}
