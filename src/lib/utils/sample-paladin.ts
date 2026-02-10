@@ -87,7 +87,14 @@ export function createSamplePaladin(): Character {
     skills,
     spellSlots: {
       level1: { current: 4, max: 4 },
-      level2: { current: 2, max: 2 }
+      level2: { current: 2, max: 2 },
+      level3: { current: 0, max: 0 },
+      level4: { current: 0, max: 0 },
+      level5: { current: 0, max: 0 },
+      level6: { current: 0, max: 0 },
+      level7: { current: 0, max: 0 },
+      level8: { current: 0, max: 0 },
+      level9: { current: 0, max: 0 },
     },
     knownSpells: [...PALADIN_SPELLS],
     preparedSpells: [], // Player can prepare up to CHA mod + half level = 4 spells
@@ -97,6 +104,7 @@ export function createSamplePaladin(): Character {
       layOnHands: { current: level * 5, max: level * 5 }, // 25 HP pool
       channelDivinity: { current: 1, max: 1 }
     },
+    classResources: [],
     weapons: [
       {
         id: 'longsword-1',
@@ -122,6 +130,12 @@ export function createSamplePaladin(): Character {
     ],
     statusConditions: [],
     deathSaves: { successes: 0, failures: 0, stabilized: false },
+    notes: [],
+    hitDice: { current: level, max: level, type: 10 },
+    restResources: {},
+    inspiration: false,
+    spellcastingAbility: 'charisma',
+    isWarlock: false,
     createdAt: new Date(),
     updatedAt: new Date()
   };

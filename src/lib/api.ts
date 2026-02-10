@@ -1,4 +1,4 @@
-import type { Race, CharacterClass, APIReference } from './types';
+import type { Race, CharacterClass, APIReference, ClassLevelData, FeatureDetails, SpellcastingInfo } from './types';
 
 const API_BASE_URL = 'https://www.dnd5eapi.co/api/2014';
 
@@ -30,6 +30,38 @@ export async function getClassDetails(index: string): Promise<CharacterClass> {
   const response = await fetch(`${API_BASE_URL}/classes/${index}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch class details: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function getClassLevel(classIndex: string, level: number): Promise<ClassLevelData> {
+  const response = await fetch(`${API_BASE_URL}/classes/${classIndex}/levels/${level}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch class level: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function getClassLevels(classIndex: string): Promise<ClassLevelData[]> {
+  const response = await fetch(`${API_BASE_URL}/classes/${classIndex}/levels`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch class levels: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function getFeatureDetails(featureIndex: string): Promise<FeatureDetails> {
+  const response = await fetch(`${API_BASE_URL}/features/${featureIndex}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch feature details: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function getClassSpellcasting(classIndex: string): Promise<SpellcastingInfo> {
+  const response = await fetch(`${API_BASE_URL}/classes/${classIndex}/spellcasting`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch spellcasting info: ${response.statusText}`);
   }
   return response.json();
 }

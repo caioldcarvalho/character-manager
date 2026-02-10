@@ -29,10 +29,23 @@ export interface Skill {
   proficient: boolean;
 }
 
-// Spell slots by level
+// Spell slot entry
+export interface SpellSlotEntry {
+  current: number;
+  max: number;
+}
+
+// Spell slots by level (1-9)
 export interface SpellSlots {
-  level1: { current: number; max: number };
-  level2: { current: number; max: number };
+  level1: SpellSlotEntry;
+  level2: SpellSlotEntry;
+  level3: SpellSlotEntry;
+  level4: SpellSlotEntry;
+  level5: SpellSlotEntry;
+  level6: SpellSlotEntry;
+  level7: SpellSlotEntry;
+  level8: SpellSlotEntry;
+  level9: SpellSlotEntry;
 }
 
 // Individual spell
@@ -173,6 +186,10 @@ export interface Character {
   restResources: RestResources;
   inspiration: boolean;
 
+  // Spellcasting ability
+  spellcastingAbility?: 'charisma' | 'intelligence' | 'wisdom' | null;
+  isWarlock?: boolean;
+
   // Future: Phase 4
   inventory?: InventoryItem[];
   currency?: Currency;
@@ -219,4 +236,44 @@ export interface CharacterClass {
   proficiencies: APIReference[];
   saving_throws: APIReference[];
   url: string;
+}
+
+// API response types for class levels
+export interface ClassLevelData {
+  level: number;
+  ability_score_bonuses: number;
+  prof_bonus: number;
+  features: APIReference[];
+  spellcasting?: {
+    cantrips_known?: number;
+    spells_known?: number;
+    spell_slots_level_1: number;
+    spell_slots_level_2: number;
+    spell_slots_level_3: number;
+    spell_slots_level_4: number;
+    spell_slots_level_5: number;
+    spell_slots_level_6: number;
+    spell_slots_level_7: number;
+    spell_slots_level_8: number;
+    spell_slots_level_9: number;
+  };
+  class_specific?: Record<string, any>;
+  index: string;
+  class: APIReference;
+  url: string;
+}
+
+export interface FeatureDetails {
+  index: string;
+  name: string;
+  level: number;
+  class: APIReference;
+  desc: string[];
+  url: string;
+}
+
+export interface SpellcastingInfo {
+  level: number;
+  spellcasting_ability: APIReference;
+  info: { name: string; desc: string[] }[];
 }

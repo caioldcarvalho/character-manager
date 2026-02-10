@@ -89,7 +89,14 @@ export function createSamplePsiWarrior(): Character {
     skills,
     spellSlots: {
       level1: { current: 0, max: 0 },
-      level2: { current: 0, max: 0 }
+      level2: { current: 0, max: 0 },
+      level3: { current: 0, max: 0 },
+      level4: { current: 0, max: 0 },
+      level5: { current: 0, max: 0 },
+      level6: { current: 0, max: 0 },
+      level7: { current: 0, max: 0 },
+      level8: { current: 0, max: 0 },
+      level9: { current: 0, max: 0 },
     },
     knownSpells: [],
     preparedSpells: [],
@@ -163,6 +170,8 @@ export function createSamplePsiWarrior(): Character {
     },
     restResources: {},
     inspiration: false,
+    spellcastingAbility: null,
+    isWarlock: false,
     createdAt: new Date(),
     updatedAt: new Date()
   };

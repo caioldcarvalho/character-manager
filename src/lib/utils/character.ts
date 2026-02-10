@@ -51,18 +51,25 @@ export function calculateInitiative(character: Character): number {
   return calculateModifier(dexScore);
 }
 
-// Calculate spell save DC (8 + proficiency + CHA modifier)
-export function calculateSpellSaveDC(character: Character): number {
-  const chaScore = getFinalAbilityScore(character, 'charisma');
-  const chaModifier = calculateModifier(chaScore);
-  return 8 + character.combatStats.proficiencyBonus + chaModifier;
+// Get spellcasting ability for a character
+function getSpellcastingAbility(character: Character): keyof AbilityScores {
+  return character.spellcastingAbility || 'charisma';
 }
 
-// Calculate spell attack bonus (proficiency + CHA modifier)
+// Calculate spell save DC (8 + proficiency + spellcasting ability modifier)
+export function calculateSpellSaveDC(character: Character): number {
+  const ability = getSpellcastingAbility(character);
+  const abilityScore = getFinalAbilityScore(character, ability);
+  const abilityMod = calculateModifier(abilityScore);
+  return 8 + character.combatStats.proficiencyBonus + abilityMod;
+}
+
+// Calculate spell attack bonus (proficiency + spellcasting ability modifier)
 export function calculateSpellAttackBonus(character: Character): number {
-  const chaScore = getFinalAbilityScore(character, 'charisma');
-  const chaModifier = calculateModifier(chaScore);
-  return character.combatStats.proficiencyBonus + chaModifier;
+  const ability = getSpellcastingAbility(character);
+  const abilityScore = getFinalAbilityScore(character, ability);
+  const abilityMod = calculateModifier(abilityScore);
+  return character.combatStats.proficiencyBonus + abilityMod;
 }
 
 // Calculate prepared spell count (CHA modifier + half paladin level, minimum 1)

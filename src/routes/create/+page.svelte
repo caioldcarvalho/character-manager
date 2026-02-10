@@ -6,11 +6,14 @@
   import Input from '$lib/components/ui/input.svelte';
   import Label from '$lib/components/ui/label.svelte';
   import { getRaces, getRaceDetails, getClasses, getClassDetails } from '$lib/api';
+  import { buildCharacterData } from '$lib/services/character-builder';
+  import { calculateModifier } from '$lib/utils/character';
+  import { getProficiencyBonus } from '$lib/constants/dnd';
   import type { APIReference, Race, CharacterClass } from '$lib/types';
   import { goto } from '$app/navigation';
   import { createSamplePaladin } from '$lib/utils/sample-paladin';
   import { createSamplePsiWarrior } from '$lib/utils/sample-psi-warrior';
-  import { Upload, UserPlus } from 'lucide-svelte';
+  import { Upload, UserPlus, Loader2 } from 'lucide-svelte';
 
   let currentStep = $state(0);
   let nameInput = $state(characterStore.character.name);
@@ -29,6 +32,10 @@
   let selectedClassDetails = $state<CharacterClass | null>(null);
   let loadingClasses = $state(false);
   let loadingClassDetails = $state(false);
+
+  // Level selection
+  let selectedLevel = $state(1);
+  let loadingBuild = $state(false);
 
   // Ability scores
   let abilityScores = $state({
@@ -50,16 +57,33 @@
   ];
 
   const steps = [
-    { title: 'Nome do Personagem', component: 'name' },
+    { title: 'Nome', component: 'name' },
     { title: 'Atributos', component: 'abilities' },
     { title: 'Raça', component: 'race' },
-    { title: 'Classe', component: 'class' }
+    { title: 'Classe', component: 'class' },
+    { title: 'Nível', component: 'level' }
   ];
 
-  function calculateModifier(score: number): string {
+  function formatModifier(score: number): string {
     const modifier = Math.floor((score - 10) / 2);
     return modifier >= 0 ? `+${modifier}` : `${modifier}`;
   }
+
+  // Preview data for level step
+  const conModifier = $derived.by(() => {
+    const conBase = abilityScores.constitution;
+    const conBonus = selectedRaceDetails?.ability_bonuses.find(b => b.ability_score.index === 'con')?.bonus || 0;
+    return Math.floor((conBase + conBonus - 10) / 2);
+  });
+
+  const estimatedHP = $derived.by(() => {
+    if (!selectedClassDetails) return 0;
+    const hitDie = selectedClassDetails.hit_die;
+    const avgRoll = Math.floor(hitDie / 2) + 1;
+    return hitDie + conModifier + (selectedLevel - 1) * (avgRoll + conModifier);
+  });
+
+  const proficiencyBonus = $derived(getProficiencyBonus(selectedLevel));
 
   async function nextStep() {
     if (currentStep === 0) {
@@ -98,7 +122,6 @@
       return nameInput.trim().length > 0;
     }
     if (currentStep === 1) {
-      // Check if all ability scores are valid (between 3 and 20)
       return Object.values(abilityScores).every(score => score >= 3 && score <= 20);
     }
     if (currentStep === 2) {
@@ -106,6 +129,9 @@
     }
     if (currentStep === 3) {
       return selectedClassDetails !== null;
+    }
+    if (currentStep === 4) {
+      return selectedLevel >= 1 && selectedLevel <= 20;
     }
     return true;
   }
@@ -186,15 +212,55 @@
     }
   }
 
-  function finishCharacterCreation() {
-    characterStore.setClass(selectedClassDetails);
+  async function finishCharacterCreation() {
+    if (!selectedClassDetails || !selectedClassIndex) return;
 
-    // Adicionar personagem à app store
-    const character = characterStore.getCharacter();
-    appStore.addCharacter(character);
+    loadingBuild = true;
+    try {
+      characterStore.setClass(selectedClassDetails);
+      characterStore.setLevel(selectedLevel);
 
-    // Redirecionar para visualização do personagem
-    goto('/character');
+      const buildData = await buildCharacterData(
+        selectedClassIndex,
+        selectedLevel,
+        conModifier,
+        selectedClassDetails.hit_die
+      );
+
+      const character = characterStore.getCharacter();
+
+      // Apply build data to character
+      const fullCharacter = {
+        ...character,
+        level: selectedLevel,
+        hitPoints: { current: buildData.maxHP, max: buildData.maxHP, temporary: 0 },
+        combatStats: {
+          ...character.combatStats,
+          proficiencyBonus: buildData.proficiencyBonus,
+          speed: selectedRaceDetails?.speed || 30,
+        },
+        spellSlots: buildData.spellSlots,
+        classFeatures: buildData.classFeatures,
+        classResources: buildData.classResources,
+        hitDice: { current: buildData.hitDice.max, max: buildData.hitDice.max, type: buildData.hitDice.type },
+        spellcastingAbility: buildData.spellcastingAbility,
+        isWarlock: buildData.isWarlock,
+        paladinResources: selectedClassIndex === 'paladin'
+          ? { layOnHands: { current: selectedLevel * 5, max: selectedLevel * 5 }, channelDivinity: { current: 1, max: 1 } }
+          : { layOnHands: { current: 0, max: 0 }, channelDivinity: { current: 0, max: 0 } },
+      };
+
+      appStore.addCharacter(fullCharacter);
+      goto('/character');
+    } catch (error) {
+      console.error('Error building character:', error);
+      // Fallback: create character without API data
+      const character = characterStore.getCharacter();
+      appStore.addCharacter({ ...character, level: selectedLevel });
+      goto('/character');
+    } finally {
+      loadingBuild = false;
+    }
   }
 
   function startOver() {
@@ -206,6 +272,7 @@
     selectedRaceDetails = null;
     selectedClassIndex = null;
     selectedClassDetails = null;
+    selectedLevel = 1;
     abilityScores = {
       strength: 10,
       dexterity: 10,
@@ -315,7 +382,7 @@
                         {/if}
                       </div>
                       <div class="text-sm text-muted-foreground">
-                        {calculateModifier(finalScore)}
+                        {formatModifier(finalScore)}
                       </div>
                     </div>
                   </div>
@@ -447,7 +514,7 @@
                   </div>
                   <div class="ml-4 text-center">
                     <div class="text-2xl font-bold text-magic">
-                      {calculateModifier(abilityScores[ability.key as keyof typeof abilityScores])}
+                      {formatModifier(abilityScores[ability.key as keyof typeof abilityScores])}
                     </div>
                     <div class="text-xs text-muted-foreground">modificador</div>
                   </div>
@@ -570,7 +637,7 @@
                         {/if}
                       </div>
                       <div class="text-xs text-muted-foreground">
-                        mod: {calculateModifier(finalScore)}
+                        mod: {formatModifier(finalScore)}
                       </div>
                     </div>
                   {/each}
@@ -655,6 +722,59 @@
         </div>
       {/if}
 
+      <!-- Step 5: Nível -->
+      {#if currentStep === 4}
+        <div class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-2">Escolha o Nível</h2>
+            <p class="text-muted-foreground">
+              Selecione o nível inicial do seu {selectedClassDetails?.name || 'personagem'}.
+            </p>
+          </div>
+
+          <!-- Level Grid 4x5 -->
+          <div class="grid grid-cols-5 gap-3">
+            {#each Array.from({ length: 20 }, (_, i) => i + 1) as lvl}
+              <button
+                type="button"
+                onclick={() => selectedLevel = lvl}
+                class="p-4 border-2 rounded-lg transition-all text-center hover:border-magic hover:bg-magic-light/10 dark:hover:bg-magic-dark/20
+                  {selectedLevel === lvl
+                    ? 'border-magic bg-magic-light/20 dark:bg-magic-dark/40'
+                    : 'border-border'}"
+              >
+                <div class="text-2xl font-bold">{lvl}</div>
+              </button>
+            {/each}
+          </div>
+
+          <!-- Preview -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 border rounded-lg bg-neutral-light/10 dark:bg-neutral-dark text-center">
+              <div class="text-sm text-muted-foreground mb-1">Bônus de Proficiência</div>
+              <div class="text-3xl font-bold text-primary">+{proficiencyBonus}</div>
+            </div>
+            <div class="p-4 border rounded-lg bg-neutral-light/10 dark:bg-neutral-dark text-center">
+              <div class="text-sm text-muted-foreground mb-1">HP Estimado</div>
+              <div class="text-3xl font-bold text-success">{estimatedHP}</div>
+            </div>
+            <div class="p-4 border rounded-lg bg-neutral-light/10 dark:bg-neutral-dark text-center">
+              <div class="text-sm text-muted-foreground mb-1">Dado de Vida</div>
+              <div class="text-3xl font-bold text-magic">{selectedLevel}d{selectedClassDetails?.hit_die || '?'}</div>
+            </div>
+          </div>
+
+          {#if selectedLevel >= 5}
+            <div class="p-4 bg-info-light/20 dark:bg-info-dark rounded-lg">
+              <p class="text-sm text-info-dark dark:text-info-light">
+                No nível {selectedLevel}, seu personagem terá acesso a features e recursos avançados da classe {selectedClassDetails?.name}.
+                Todos os dados serão carregados automaticamente da API do D&D 5e.
+              </p>
+            </div>
+          {/if}
+        </div>
+      {/if}
+
       <!-- Navigation buttons -->
       <div class="flex justify-between mt-8">
         <Button variant="outline" onclick={prevStep} disabled={currentStep === 0}>
@@ -666,8 +786,12 @@
             Próximo
           </Button>
         {:else}
-          <Button onclick={finishCharacterCreation} disabled={!canProceed()}>
-            Finalizar Criação
+          <Button onclick={finishCharacterCreation} disabled={!canProceed() || loadingBuild}>
+            {#if loadingBuild}
+              <Loader2 size={16} class="animate-spin mr-2" /> Criando personagem...
+            {:else}
+              Finalizar Criação
+            {/if}
           </Button>
         {/if}
       </div>

@@ -28,15 +28,32 @@ function getDefaultCharacter(): Character {
     hitPoints: { current: 10, max: 10, temporary: 0 },
     combatStats: { initiative: 0, armorClass: 10, speed: 30, proficiencyBonus: 2 },
     skills,
-    spellSlots: { level1: { current: 0, max: 0 }, level2: { current: 0, max: 0 } },
+    spellSlots: {
+      level1: { current: 0, max: 0 },
+      level2: { current: 0, max: 0 },
+      level3: { current: 0, max: 0 },
+      level4: { current: 0, max: 0 },
+      level5: { current: 0, max: 0 },
+      level6: { current: 0, max: 0 },
+      level7: { current: 0, max: 0 },
+      level8: { current: 0, max: 0 },
+      level9: { current: 0, max: 0 },
+    },
     knownSpells: [],
     preparedSpells: [],
     classFeatures: [],
     fightingStyle: '',
     paladinResources: { layOnHands: { current: 0, max: 0 }, channelDivinity: { current: 0, max: 0 } },
+    classResources: [],
     weapons: [],
     statusConditions: [],
     deathSaves: { successes: 0, failures: 0, stabilized: false },
+    notes: [],
+    hitDice: { current: 1, max: 1, type: 8 },
+    restResources: {},
+    inspiration: false,
+    spellcastingAbility: null,
+    isWarlock: false,
     createdAt: new Date(),
     updatedAt: new Date()
   };
@@ -60,6 +77,9 @@ function createCharacterStore() {
     },
     setClass(characterClass: any) {
       character.class = characterClass;
+    },
+    setLevel(level: number) {
+      character.level = Math.max(1, Math.min(20, level));
     },
     reset() {
       character = getDefaultCharacter();

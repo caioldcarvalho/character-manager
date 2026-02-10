@@ -21,6 +21,22 @@ function initializeSkills(proficientSkills: string[] = []): Record<string, Skill
   return skills;
 }
 
+// Migrate spell slots from old 2-level format to 9-level format
+function migrateSpellSlots(slots: any): import('$lib/types').SpellSlots {
+  const defaultSlot = { current: 0, max: 0 };
+  return {
+    level1: slots?.level1 || defaultSlot,
+    level2: slots?.level2 || defaultSlot,
+    level3: slots?.level3 || defaultSlot,
+    level4: slots?.level4 || defaultSlot,
+    level5: slots?.level5 || defaultSlot,
+    level6: slots?.level6 || defaultSlot,
+    level7: slots?.level7 || defaultSlot,
+    level8: slots?.level8 || defaultSlot,
+    level9: slots?.level9 || defaultSlot,
+  };
+}
+
 // Migrate character to add missing fields
 function migrateCharacter(char: any): Character {
   const level = char.level || 5;
@@ -28,6 +44,21 @@ function migrateCharacter(char: any): Character {
 
   // Get hit dice type from class
   const hitDiceType = char.class?.hit_die || 10;
+
+  // Detect warlock
+  const isWarlock = char.isWarlock ?? (char.class?.index === 'warlock');
+
+  // Default spellcasting ability based on class
+  const defaultSpellcastingAbility = (() => {
+    const classIndex = char.class?.index;
+    if (!classIndex) return null;
+    const map: Record<string, 'charisma' | 'intelligence' | 'wisdom'> = {
+      paladin: 'charisma', bard: 'charisma', sorcerer: 'charisma', warlock: 'charisma',
+      wizard: 'intelligence',
+      cleric: 'wisdom', druid: 'wisdom', ranger: 'wisdom',
+    };
+    return map[classIndex] || null;
+  })();
 
   return {
     ...char,
@@ -39,10 +70,7 @@ function migrateCharacter(char: any): Character {
       proficiencyBonus
     },
     skills: char.skills || initializeSkills([]),
-    spellSlots: char.spellSlots || {
-      level1: { current: 4, max: 4 },
-      level2: { current: 2, max: 2 }
-    },
+    spellSlots: migrateSpellSlots(char.spellSlots),
     knownSpells: char.knownSpells || [...PALADIN_SPELLS],
     preparedSpells: char.preparedSpells || [],
     classFeatures: char.classFeatures || [],
@@ -70,6 +98,10 @@ function migrateCharacter(char: any): Character {
     },
     inspiration: char.inspiration || false,
 
+    // Spellcasting
+    spellcastingAbility: char.spellcastingAbility ?? defaultSpellcastingAbility,
+    isWarlock,
+
     // Future fields (optional)
     inventory: char.inventory || undefined,
     currency: char.currency || undefined,
@@ -94,10 +126,8 @@ function createAppStore() {
     },
     addCharacter(character: Character) {
       state.characters.push(migrateCharacter(character));
-      // Auto-select if it's the first character
-      if (state.characters.length === 1) {
-        state.activeCharacterId = character.id;
-      }
+      // Always select the newly added character
+      state.activeCharacterId = character.id;
       this.saveToLocalStorage();
     },
     setActiveCharacter(id: string | null) {
@@ -181,9 +211,9 @@ function createAppStore() {
     },
 
     // Spell Slot Management
-    updateSpellSlot(id: string, level: 1 | 2, current: number) {
+    updateSpellSlot(id: string, level: number, current: number) {
       const char = state.characters.find(c => c.id === id);
-      if (!char) return;
+      if (!char || level < 1 || level > 9) return;
 
       const slotKey = `level${level}` as keyof typeof char.spellSlots;
       const maxSlots = char.spellSlots[slotKey].max;
@@ -191,9 +221,9 @@ function createAppStore() {
       this.saveToLocalStorage();
     },
 
-    useSpellSlot(id: string, level: 1 | 2) {
+    useSpellSlot(id: string, level: number) {
       const char = state.characters.find(c => c.id === id);
-      if (!char) return;
+      if (!char || level < 1 || level > 9) return;
 
       const slotKey = `level${level}` as keyof typeof char.spellSlots;
       if (char.spellSlots[slotKey].current > 0) {
@@ -218,35 +248,6 @@ function createAppStore() {
     },
 
     // Resource Management
-    longRest(id: string) {
-      const char = state.characters.find(c => c.id === id);
-      if (!char) return;
-
-      // Restore HP
-      char.hitPoints.current = char.hitPoints.max;
-      char.hitPoints.temporary = 0;
-
-      // Restore spell slots
-      char.spellSlots.level1.current = char.spellSlots.level1.max;
-      char.spellSlots.level2.current = char.spellSlots.level2.max;
-
-      // Restore class features
-      char.classFeatures.forEach(feature => {
-        if (feature.uses) {
-          feature.uses.current = feature.uses.max;
-        }
-      });
-
-      // Restore paladin resources
-      char.paladinResources.layOnHands.current = char.paladinResources.layOnHands.max;
-      char.paladinResources.channelDivinity.current = char.paladinResources.channelDivinity.max;
-
-      // Reset death saves
-      char.deathSaves = { successes: 0, failures: 0, stabilized: false };
-
-      this.saveToLocalStorage();
-    },
-
     useClassFeature(id: string, featureName: string) {
       const char = state.characters.find(c => c.id === id);
       if (!char) return;
@@ -500,6 +501,14 @@ function createAppStore() {
           res.current = res.max;
         }
       });
+
+      // Warlock: restore all spell slots on short rest (Pact Magic)
+      if (char.isWarlock) {
+        Object.keys(char.spellSlots).forEach(key => {
+          const slotKey = key as keyof typeof char.spellSlots;
+          char.spellSlots[slotKey].current = char.spellSlots[slotKey].max;
+        });
+      }
 
       // Update timestamp
       char.restResources.lastShortRest = new Date().toISOString();
