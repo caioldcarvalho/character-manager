@@ -42,9 +42,14 @@
     equipped: false
   });
 
-  // Edit currency
-  let editingCurrency = $state(false);
-  let currencyInput = $state<Currency>({ platinum: 0, gold: 0, silver: 0, copper: 0 });
+  const currencySteps = [1000, 100, 10, 1];
+
+  const coins: { key: keyof Currency; label: string; abbr: string; highlight?: string }[] = [
+    { key: 'platinum', label: 'Platina', abbr: 'PP' },
+    { key: 'gold', label: 'Ouro', abbr: 'PO', highlight: 'text-warning' },
+    { key: 'silver', label: 'Prata', abbr: 'PA' },
+    { key: 'copper', label: 'Cobre', abbr: 'PC' }
+  ];
 
   // Expanded item details
   let expandedItems = $state<Set<string>>(new Set());
@@ -98,16 +103,11 @@
     appStore.updateInventoryItem(character.id, itemId, { equipped: !item.equipped });
   }
 
-  function startEditCurrency() {
+  function adjustCurrency(type: keyof Currency, delta: number) {
     if (!character) return;
-    currencyInput = { ...(character.currency || { platinum: 0, gold: 0, silver: 0, copper: 0 }) };
-    editingCurrency = true;
-  }
-
-  function saveCurrency() {
-    if (!character) return;
-    appStore.updateCurrency(character.id, currencyInput);
-    editingCurrency = false;
+    const current = character.currency?.[type] || 0;
+    const newVal = Math.max(0, current + delta);
+    appStore.updateCurrency(character.id, { [type]: newVal });
   }
 
   function toggleExpanded(itemId: string) {
@@ -128,74 +128,38 @@
   <div class="space-y-6">
     <!-- Currency -->
     <Card variant="glass" class="p-6 animate-fade-in">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2">
-          <Coins size={20} class="text-warning" />
-          <h2 class="text-xl font-bold">Moedas</h2>
-        </div>
-        {#if !editingCurrency}
-          <button
-            onclick={startEditCurrency}
-            class="px-3 py-1 bg-secondary hover:bg-secondary/80 text-foreground rounded-md text-sm transition-colors"
-          >
-            Editar
-          </button>
-        {/if}
+      <div class="flex items-center gap-2 mb-4">
+        <Coins size={20} class="text-warning" />
+        <h2 class="text-xl font-bold">Moedas</h2>
       </div>
 
-      {#if editingCurrency}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div>
-            <label class="text-xs text-muted-foreground">Platina (PP)</label>
-            <input type="number" bind:value={currencyInput.platinum} min="0"
-              class="w-full px-2 py-1.5 bg-secondary border border-input rounded-md text-sm text-foreground" />
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {#each coins as coin}
+          <div class="flex flex-col items-center p-3 bg-secondary rounded-lg gap-2">
+            <div class="text-xs text-muted-foreground">{coin.abbr}</div>
+            <div class="text-2xl font-bold {coin.highlight || ''}">{character.currency?.[coin.key] || 0}</div>
+            <div class="flex flex-col gap-1 w-full">
+              {#each currencySteps as step}
+                <div class="flex items-center gap-1">
+                  <button
+                    onclick={() => adjustCurrency(coin.key, -step)}
+                    disabled={(character.currency?.[coin.key] || 0) < step}
+                    class="flex-1 py-0.5 bg-background hover:bg-danger/20 text-xs font-medium rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    -{step}
+                  </button>
+                  <button
+                    onclick={() => adjustCurrency(coin.key, step)}
+                    class="flex-1 py-0.5 bg-background hover:bg-success/20 text-xs font-medium rounded transition-colors"
+                  >
+                    +{step}
+                  </button>
+                </div>
+              {/each}
+            </div>
           </div>
-          <div>
-            <label class="text-xs text-muted-foreground">Ouro (PO)</label>
-            <input type="number" bind:value={currencyInput.gold} min="0"
-              class="w-full px-2 py-1.5 bg-secondary border border-input rounded-md text-sm text-foreground" />
-          </div>
-          <div>
-            <label class="text-xs text-muted-foreground">Prata (PP)</label>
-            <input type="number" bind:value={currencyInput.silver} min="0"
-              class="w-full px-2 py-1.5 bg-secondary border border-input rounded-md text-sm text-foreground" />
-          </div>
-          <div>
-            <label class="text-xs text-muted-foreground">Cobre (PC)</label>
-            <input type="number" bind:value={currencyInput.copper} min="0"
-              class="w-full px-2 py-1.5 bg-secondary border border-input rounded-md text-sm text-foreground" />
-          </div>
-        </div>
-        <div class="flex gap-2 mt-3">
-          <button onclick={saveCurrency}
-            class="px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-sm font-semibold transition-colors">
-            Salvar
-          </button>
-          <button onclick={() => editingCurrency = false}
-            class="px-4 py-1.5 bg-secondary hover:bg-secondary/80 text-foreground rounded-md text-sm transition-colors">
-            Cancelar
-          </button>
-        </div>
-      {:else}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div class="text-center p-3 bg-secondary rounded-lg">
-            <div class="text-xs text-muted-foreground">PP</div>
-            <div class="text-xl font-bold">{character.currency?.platinum || 0}</div>
-          </div>
-          <div class="text-center p-3 bg-secondary rounded-lg">
-            <div class="text-xs text-muted-foreground">PO</div>
-            <div class="text-xl font-bold text-warning">{character.currency?.gold || 0}</div>
-          </div>
-          <div class="text-center p-3 bg-secondary rounded-lg">
-            <div class="text-xs text-muted-foreground">PP</div>
-            <div class="text-xl font-bold">{character.currency?.silver || 0}</div>
-          </div>
-          <div class="text-center p-3 bg-secondary rounded-lg">
-            <div class="text-xs text-muted-foreground">PC</div>
-            <div class="text-xl font-bold">{character.currency?.copper || 0}</div>
-          </div>
-        </div>
-      {/if}
+        {/each}
+      </div>
     </Card>
 
     <!-- Encumbrance -->
