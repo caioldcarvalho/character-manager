@@ -133,7 +133,7 @@
         <h2 class="text-xl font-bold">Moedas</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {#each coins as coin}
           <div class="flex items-center gap-3 p-3 bg-secondary rounded-lg">
             <!-- Valor (esquerda) -->
