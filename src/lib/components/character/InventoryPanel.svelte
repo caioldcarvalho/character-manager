@@ -140,19 +140,20 @@
             <div class="text-2xl font-bold {coin.highlight || ''}">{character.currency?.[coin.key] || 0}</div>
             <div class="flex flex-col gap-1 w-full">
               {#each currencySteps as step}
-                <div class="flex items-center gap-1">
+                <div class="flex items-center rounded overflow-hidden border border-border">
                   <button
                     onclick={() => adjustCurrency(coin.key, -step)}
                     disabled={(character.currency?.[coin.key] || 0) < step}
-                    class="flex-1 py-0.5 bg-background hover:bg-danger/20 text-xs font-medium rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    class="px-2 py-0.5 text-xs font-bold text-danger hover:bg-danger/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    -{step}
+                    -
                   </button>
+                  <span class="flex-1 text-center text-xs font-medium bg-background py-0.5">{step}</span>
                   <button
                     onclick={() => adjustCurrency(coin.key, step)}
-                    class="flex-1 py-0.5 bg-background hover:bg-success/20 text-xs font-medium rounded transition-colors"
+                    class="px-2 py-0.5 text-xs font-bold text-success hover:bg-success/20 transition-colors"
                   >
-                    +{step}
+                    +
                   </button>
                 </div>
               {/each}
