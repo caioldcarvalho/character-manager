@@ -16,6 +16,7 @@
   import ConcentrationTracker from '$lib/components/character/ConcentrationTracker.svelte';
   import DiceRoller from '$lib/components/character/DiceRoller.svelte';
   import InventoryPanel from '$lib/components/character/InventoryPanel.svelte';
+  import FeatsPanel from '$lib/components/character/FeatsPanel.svelte';
   import {
     getFinalAbilityScore,
     formatModifier,
@@ -26,6 +27,7 @@
     calculateInitiative
   } from '$lib/utils/character';
   import { Pencil, Shield, Eye, Minus, Plus } from 'lucide-svelte';
+  import { getModifierTotal } from '$lib/utils/modifiers';
 
   const abilities = [
     { key: 'strength', label: 'Força', abbr: 'FOR' },
@@ -43,7 +45,7 @@
 
   const passivePerception = $derived(() => {
     if (!appStore.activeCharacter) return 10;
-    return 10 + calculateSkillBonus(appStore.activeCharacter, 'perception');
+    return 10 + calculateSkillBonus(appStore.activeCharacter, 'perception') + getModifierTotal(appStore.activeCharacter, 'passive:perception');
   });
 
   function startEdit() {
@@ -227,6 +229,9 @@
 
     <!-- Class Features -->
     <ClassFeatures />
+
+    <!-- Feats -->
+    <FeatsPanel />
 
     <!-- Resources Row -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

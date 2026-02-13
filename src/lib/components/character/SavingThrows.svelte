@@ -2,6 +2,7 @@
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import { getFinalAbilityScore, calculateModifier } from '$lib/utils/character';
+  import { getModifierTotal, hasFeatSavingThrowProficiency } from '$lib/utils/modifiers';
   import type { AbilityScores } from '$lib/types';
 
   const character = $derived(appStore.activeCharacter);
@@ -19,12 +20,14 @@
     if (!character) return 0;
     const score = getFinalAbilityScore(character, ability);
     const mod = calculateModifier(score);
-    const proficient = character.savingThrowProficiencies?.[ability] ?? false;
-    return mod + (proficient ? character.combatStats.proficiencyBonus : 0);
+    const proficient = isProficient(ability);
+    const featBonus = getModifierTotal(character, `save:${ability}`);
+    return mod + (proficient ? character.combatStats.proficiencyBonus : 0) + featBonus;
   }
 
   function isProficient(ability: keyof AbilityScores): boolean {
-    return character?.savingThrowProficiencies?.[ability] ?? false;
+    if (!character) return false;
+    return (character.savingThrowProficiencies?.[ability] ?? false) || hasFeatSavingThrowProficiency(character, ability);
   }
 
   function toggleProficiency(ability: keyof AbilityScores) {

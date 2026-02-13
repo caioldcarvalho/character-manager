@@ -1,4 +1,4 @@
-import type { Character, Skill } from '$lib/types';
+import type { Character, Skill, CharacterFeat } from '$lib/types';
 import { DND_SKILLS, getProficiencyBonus } from '$lib/constants/dnd';
 import { PALADIN_SPELLS } from '$lib/constants/paladin-spells';
 
@@ -105,7 +105,8 @@ function migrateCharacter(char: any): Character {
     // Inventory & currency
     inventory: char.inventory || [],
     currency: char.currency || { platinum: 0, gold: 0, silver: 0, copper: 0 },
-    cantrips: char.cantrips || undefined
+    cantrips: char.cantrips || undefined,
+    feats: char.feats || []
   };
 }
 
@@ -505,6 +506,14 @@ function createAppStore() {
         }
       });
 
+      // Recover feat short-rest resources
+      char.feats?.forEach(feat => {
+        if (!feat.enabled) return;
+        feat.resources.forEach(res => {
+          if (res.rechargeOn === 'short') res.current = res.max;
+        });
+      });
+
       // Update timestamp
       char.restResources.lastShortRest = new Date().toISOString();
 
@@ -557,6 +566,14 @@ function createAppStore() {
 
       // Reset death saves
       char.deathSaves = { successes: 0, failures: 0, stabilized: false };
+
+      // Recover feat resources (both short and long rest)
+      char.feats?.forEach(feat => {
+        if (!feat.enabled) return;
+        feat.resources.forEach(res => {
+          res.current = res.max;
+        });
+      });
 
       // Clear concentration
       char.concentratingOn = null;
@@ -632,6 +649,49 @@ function createAppStore() {
       char.inspiration = !char.inspiration;
       char.updatedAt = new Date();
       this.saveToLocalStorage();
+    },
+
+    // Feats
+    addFeat(id: string, feat: CharacterFeat) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      if (!char.feats) char.feats = [];
+      char.feats.push(feat);
+      this.saveToLocalStorage();
+    },
+
+    removeFeat(id: string, featIndex: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats) return;
+      char.feats.splice(featIndex, 1);
+      this.saveToLocalStorage();
+    },
+
+    toggleFeatEnabled(id: string, featIndex: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats || !char.feats[featIndex]) return;
+      char.feats[featIndex].enabled = !char.feats[featIndex].enabled;
+      this.saveToLocalStorage();
+    },
+
+    useFeatResource(id: string, featIndex: number, resourceName: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats || !char.feats[featIndex]) return;
+      const resource = char.feats[featIndex].resources.find(r => r.name === resourceName);
+      if (resource && resource.current > 0) {
+        resource.current--;
+        this.saveToLocalStorage();
+      }
+    },
+
+    updateFeatChoice(id: string, featIndex: number, choiceId: string, optionId: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats || !char.feats[featIndex]) return;
+      const choice = char.feats[featIndex].choices.find(c => c.id === choiceId);
+      if (choice) {
+        choice.selectedOptionId = optionId;
+        this.saveToLocalStorage();
+      }
     }
   };
 }

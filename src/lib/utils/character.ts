@@ -1,5 +1,6 @@
 import type { Character, AbilityScores } from '$lib/types';
 import { DND_SKILLS } from '$lib/constants/dnd';
+import { getModifierTotal } from '$lib/utils/modifiers';
 
 // Calculate ability modifier from score
 export function calculateModifier(score: number): number {
@@ -30,7 +31,9 @@ export function getFinalAbilityScore(character: Character, ability: keyof Abilit
     b => b.ability_score.index === abilityMap[ability]
   );
 
-  return base + (bonus?.bonus || 0);
+  const racial = bonus?.bonus || 0;
+  const featBonus = getModifierTotal(character, `ability:${ability}`);
+  return Math.min(20, base + racial + featBonus);
 }
 
 // Calculate skill bonus
@@ -42,27 +45,28 @@ export function calculateSkillBonus(character: Character, skillKey: string): num
   const abilityModifier = calculateModifier(abilityScore);
   const proficiencyBonus = skill.proficient ? character.combatStats.proficiencyBonus : 0;
 
-  return abilityModifier + proficiencyBonus;
+  const featBonus = getModifierTotal(character, `skill:${skillKey}`);
+  return abilityModifier + proficiencyBonus + featBonus;
 }
 
 // Calculate initiative (DEX modifier)
 export function calculateInitiative(character: Character): number {
   const dexScore = getFinalAbilityScore(character, 'dexterity');
-  return calculateModifier(dexScore);
+  return calculateModifier(dexScore) + getModifierTotal(character, 'initiative');
 }
 
 // Calculate spell save DC (8 + proficiency + CHA modifier)
 export function calculateSpellSaveDC(character: Character): number {
   const chaScore = getFinalAbilityScore(character, 'charisma');
   const chaModifier = calculateModifier(chaScore);
-  return 8 + character.combatStats.proficiencyBonus + chaModifier;
+  return 8 + character.combatStats.proficiencyBonus + chaModifier + getModifierTotal(character, 'spellSaveDC');
 }
 
 // Calculate spell attack bonus (proficiency + CHA modifier)
 export function calculateSpellAttackBonus(character: Character): number {
   const chaScore = getFinalAbilityScore(character, 'charisma');
   const chaModifier = calculateModifier(chaScore);
-  return character.combatStats.proficiencyBonus + chaModifier;
+  return character.combatStats.proficiencyBonus + chaModifier + getModifierTotal(character, 'spellAttackBonus');
 }
 
 // Calculate prepared spell count (CHA modifier + half paladin level, minimum 1)
@@ -88,7 +92,7 @@ export function calculateWeaponAttackBonus(character: Character, weapon: any): n
     abilityModifier = calculateModifier(strScore);
   }
 
-  return abilityModifier + character.combatStats.proficiencyBonus;
+  return abilityModifier + character.combatStats.proficiencyBonus + getModifierTotal(character, 'weaponAttackBonus', { weaponType: weapon.type });
 }
 
 // Calculate weapon damage bonus
@@ -96,13 +100,15 @@ export function calculateWeaponDamageBonus(character: Character, weapon: any): n
   const strScore = getFinalAbilityScore(character, 'strength');
   const dexScore = getFinalAbilityScore(character, 'dexterity');
 
+  let base: number;
   if (weapon.finesse) {
-    return Math.max(calculateModifier(strScore), calculateModifier(dexScore));
+    base = Math.max(calculateModifier(strScore), calculateModifier(dexScore));
   } else if (weapon.type === 'ranged') {
-    return calculateModifier(dexScore);
+    base = calculateModifier(dexScore);
   } else {
-    return calculateModifier(strScore);
+    base = calculateModifier(strScore);
   }
+  return base + getModifierTotal(character, 'weaponDamageBonus', { weaponType: weapon.type });
 }
 
 // Format damage roll

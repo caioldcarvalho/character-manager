@@ -151,6 +151,74 @@ export interface Currency {
   copper: number;
 }
 
+// Feat modifier targets
+export type ModifierTarget =
+  | `ability:${keyof AbilityScores}`
+  | `skill:${string}`
+  | `passive:${string}`
+  | `save:${keyof AbilityScores}`
+  | 'initiative'
+  | 'armorClass'
+  | 'speed'
+  | 'hitPointsMaxPerLevel'
+  | 'spellSaveDC'
+  | 'spellAttackBonus'
+  | 'weaponAttackBonus'
+  | 'weaponDamageBonus';
+
+export interface Modifier {
+  target: ModifierTarget;
+  value: number;
+  weaponFilter?: 'melee' | 'ranged';
+}
+
+export interface ProficiencyGrant {
+  type: 'savingThrow' | 'expertise';
+  target: string; // ability key or skill key
+}
+
+export interface FeatResource {
+  name: string;
+  current: number;
+  max: number;
+  rechargeOn: 'short' | 'long';
+}
+
+export interface FeatChoiceOption {
+  id: string;
+  label: string;
+  modifiers?: Modifier[];
+  proficiencies?: ProficiencyGrant[];
+}
+
+export interface FeatChoice {
+  id: string;
+  label: string;
+  options: FeatChoiceOption[];
+  selectedOptionId?: string;
+}
+
+export interface FeatDefinition {
+  id: string;
+  name: string;
+  description: string;
+  modifiers: Modifier[];
+  proficiencies: ProficiencyGrant[];
+  resources: FeatResource[];
+  choices: FeatChoice[];
+}
+
+export interface CharacterFeat {
+  definitionId: string; // matches FeatDefinition.id or 'custom'
+  name: string;
+  description: string;
+  enabled: boolean;
+  modifiers: Modifier[];
+  proficiencies: ProficiencyGrant[];
+  resources: FeatResource[];
+  choices: FeatChoice[];
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -187,6 +255,7 @@ export interface Character {
   inventory?: InventoryItem[];
   currency?: Currency;
   cantrips?: string[];
+  feats?: CharacterFeat[];
 }
 
 export interface APIReference {
