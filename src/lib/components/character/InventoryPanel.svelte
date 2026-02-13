@@ -133,12 +133,16 @@
         <h2 class="text-xl font-bold">Moedas</h2>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         {#each coins as coin}
-          <div class="flex flex-col items-center p-3 bg-secondary rounded-lg gap-2">
-            <div class="text-xs text-muted-foreground">{coin.abbr}</div>
-            <div class="text-2xl font-bold {coin.highlight || ''}">{character.currency?.[coin.key] || 0}</div>
-            <div class="flex flex-col gap-1 w-full">
+          <div class="flex items-center gap-3 p-3 bg-secondary rounded-lg">
+            <!-- Valor (esquerda) -->
+            <div class="flex flex-col items-center min-w-[60px]">
+              <div class="text-xs text-muted-foreground">{coin.abbr}</div>
+              <div class="text-2xl font-bold {coin.highlight || ''}">{character.currency?.[coin.key] || 0}</div>
+            </div>
+            <!-- Botões (direita) -->
+            <div class="flex flex-col gap-1 flex-1">
               {#each currencySteps as step}
                 <div class="flex items-center rounded overflow-hidden border border-border">
                   <button
