@@ -12,14 +12,20 @@
   import StatusConditionsPanel from '$lib/components/character/StatusConditionsPanel.svelte';
   import NotesPanel from '$lib/components/character/NotesPanel.svelte';
   import RestManager from '$lib/components/character/RestManager.svelte';
+  import SavingThrows from '$lib/components/character/SavingThrows.svelte';
+  import ConcentrationTracker from '$lib/components/character/ConcentrationTracker.svelte';
+  import DiceRoller from '$lib/components/character/DiceRoller.svelte';
+  import InventoryPanel from '$lib/components/character/InventoryPanel.svelte';
   import {
     getFinalAbilityScore,
     formatModifier,
+    calculateModifier,
+    calculateSkillBonus,
     calculateSpellSaveDC,
     calculateSpellAttackBonus,
     calculateInitiative
   } from '$lib/utils/character';
-  import { Pencil, Backpack } from 'lucide-svelte';
+  import { Pencil, Shield, Eye, Minus, Plus } from 'lucide-svelte';
 
   const abilities = [
     { key: 'strength', label: 'Força', abbr: 'FOR' },
@@ -32,6 +38,13 @@
 
   let editingName = $state(false);
   let nameInput = $state('');
+  let editingAC = $state(false);
+  let acInput = $state(10);
+
+  const passivePerception = $derived(() => {
+    if (!appStore.activeCharacter) return 10;
+    return 10 + calculateSkillBonus(appStore.activeCharacter, 'perception');
+  });
 
   function startEdit() {
     if (appStore.activeCharacter) {
@@ -45,6 +58,20 @@
       appStore.updateCharacter(appStore.activeCharacter.id, { name: nameInput.trim() });
     }
     editingName = false;
+  }
+
+  function startEditAC() {
+    if (appStore.activeCharacter) {
+      acInput = appStore.activeCharacter.combatStats.armorClass;
+      editingAC = true;
+    }
+  }
+
+  function saveAC() {
+    if (appStore.activeCharacter) {
+      appStore.updateArmorClass(appStore.activeCharacter.id, acInput);
+    }
+    editingAC = false;
   }
 </script>
 
@@ -88,27 +115,67 @@
       <HPTracker />
       <RestManager />
 
-      <!-- Spell Stats Card -->
+      <!-- Combat & Spell Stats Card -->
       <Card variant="glass" class="p-6 animate-fade-in">
-        <h2 class="text-xl font-bold mb-4">Magia</h2>
+        <h2 class="text-xl font-bold mb-4">Combate</h2>
         <div class="space-y-4">
+          <!-- Armor Class (editable) -->
           <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
-            <span class="text-sm font-medium">CD de Magia</span>
-            <span class="text-2xl font-bold text-primary">{spellSaveDC}</span>
+            <div class="flex items-center gap-2">
+              <Shield size={18} class="text-primary" />
+              <span class="text-sm font-medium">CA</span>
+            </div>
+            {#if editingAC}
+              <div class="flex items-center gap-2">
+                <button onclick={() => acInput = Math.max(0, acInput - 1)}
+                  class="w-7 h-7 flex items-center justify-center bg-background rounded hover:bg-background/80 transition-colors">
+                  <Minus size={14} />
+                </button>
+                <input type="number" bind:value={acInput}
+                  onblur={saveAC}
+                  onkeydown={(e) => e.key === 'Enter' && saveAC()}
+                  class="w-16 text-center text-2xl font-bold bg-background border border-input rounded-md text-foreground"
+                  autofocus />
+                <button onclick={() => acInput++}
+                  class="w-7 h-7 flex items-center justify-center bg-background rounded hover:bg-background/80 transition-colors">
+                  <Plus size={14} />
+                </button>
+              </div>
+            {:else}
+              <button onclick={startEditAC} class="text-2xl font-bold hover:text-primary transition-colors" title="Clique para editar">
+                {character.combatStats.armorClass}
+              </button>
+            {/if}
           </div>
+
+          <!-- Passive Perception -->
           <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
-            <span class="text-sm font-medium">Ataque Mágico</span>
-            <span class="text-2xl font-bold text-primary">
-              {spellAttackBonus >= 0 ? '+' : ''}{spellAttackBonus}
-            </span>
+            <div class="flex items-center gap-2">
+              <Eye size={18} class="text-primary" />
+              <span class="text-sm font-medium">Percepção Passiva</span>
+            </div>
+            <span class="text-2xl font-bold">{passivePerception()}</span>
           </div>
-          <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
-            <span class="text-sm font-medium">CA</span>
-            <span class="text-2xl font-bold">{character.combatStats.armorClass}</span>
-          </div>
+
+          <!-- Spell stats (only for casters) -->
+          {#if character.spellSlots && Object.values(character.spellSlots).some(s => s.max > 0)}
+            <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+              <span class="text-sm font-medium">CD de Magia</span>
+              <span class="text-2xl font-bold text-primary">{spellSaveDC}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+              <span class="text-sm font-medium">Ataque Mágico</span>
+              <span class="text-2xl font-bold text-primary">
+                {spellAttackBonus >= 0 ? '+' : ''}{spellAttackBonus}
+              </span>
+            </div>
+          {/if}
         </div>
       </Card>
     </div>
+
+    <!-- Concentration Tracker -->
+    <ConcentrationTracker />
 
     <!-- Compact Initiative Tracker -->
     <Card variant="glass" class="p-4 animate-fade-in">
@@ -238,31 +305,16 @@
       </Card>
     {/if}
 
-    <!-- Testes de Resistência -->
-    {#if character.class?.saving_throws && character.class.saving_throws.length > 0}
-      <Card class="p-6">
-        <h2 class="text-xl font-bold mb-4">Testes de Resistência</h2>
-        <div class="flex gap-3 flex-wrap">
-          {#each character.class.saving_throws as save}
-            {@const saveAbility = save.index as keyof typeof character.abilityScores}
-            {@const saveScore = getFinalAbilityScore(character, saveAbility)}
-            {@const saveBonus = Math.floor((saveScore - 10) / 2) + character.combatStats.proficiencyBonus}
-            <div class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold">
-              {save.name} {saveBonus >= 0 ? '+' : ''}{saveBonus}
-            </div>
-          {/each}
-        </div>
-      </Card>
-    {/if}
+    <!-- Saving Throws -->
+    <SavingThrows />
+
+    <!-- Dice Roller -->
+    <DiceRoller />
   </div>
 {:else if appStore.state.activeTab === 'abilities'}
   <SkillsPanel />
 {:else if appStore.state.activeTab === 'items'}
-  <div class="flex flex-col items-center justify-center py-12 text-center">
-    <div class="mb-4 text-muted-foreground/30"><Backpack size={64} /></div>
-    <h2 class="text-2xl font-bold mb-2 text-foreground">Itens</h2>
-    <p class="text-muted-foreground">Em desenvolvimento...</p>
-  </div>
+  <InventoryPanel />
 {:else if appStore.state.activeTab === 'notes'}
   <NotesPanel />
 {:else if appStore.state.activeTab === 'spells'}

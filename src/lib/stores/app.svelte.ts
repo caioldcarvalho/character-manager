@@ -21,6 +21,39 @@ function initializeSkills(proficientSkills: string[] = []): Record<string, Skill
   return skills;
 }
 
+// Derive saving throw proficiencies from class API data
+function deriveSavingThrowProficiencies(char: any): Record<string, boolean> {
+  const profs: Record<string, boolean> = {
+    strength: false,
+    dexterity: false,
+    constitution: false,
+    intelligence: false,
+    wisdom: false,
+    charisma: false
+  };
+
+  const indexToAbility: Record<string, string> = {
+    str: 'strength', dex: 'dexterity', con: 'constitution',
+    int: 'intelligence', wis: 'wisdom', cha: 'charisma'
+  };
+
+  if (char.class?.saving_throws) {
+    for (const st of char.class.saving_throws) {
+      const ability = indexToAbility[st.index];
+      if (ability) profs[ability] = true;
+    }
+  }
+
+  return profs;
+}
+
+// Migrate old level1/level2 spell slots to dynamic format
+function migrateSpellSlots(slots: any): Record<string, { current: number; max: number }> {
+  if (!slots) return { level1: { current: 4, max: 4 }, level2: { current: 2, max: 2 } };
+  // Already in new format if it has string keys like level1, level2, etc.
+  return slots;
+}
+
 // Migrate character to add missing fields
 function migrateCharacter(char: any): Character {
   const level = char.level || 5;
@@ -39,10 +72,7 @@ function migrateCharacter(char: any): Character {
       proficiencyBonus
     },
     skills: char.skills || initializeSkills([]),
-    spellSlots: char.spellSlots || {
-      level1: { current: 4, max: 4 },
-      level2: { current: 2, max: 2 }
-    },
+    spellSlots: migrateSpellSlots(char.spellSlots),
     knownSpells: char.knownSpells || [...PALADIN_SPELLS],
     preparedSpells: char.preparedSpells || [],
     classFeatures: char.classFeatures || [],
@@ -52,6 +82,8 @@ function migrateCharacter(char: any): Character {
       channelDivinity: { current: 1, max: 1 }
     },
     classResources: char.classResources || [],
+    savingThrowProficiencies: char.savingThrowProficiencies || deriveSavingThrowProficiencies(char),
+    concentratingOn: char.concentratingOn ?? null,
     psionicDice: char.psionicDice || undefined,
     weapons: char.weapons || [],
     statusConditions: char.statusConditions || [],
@@ -70,9 +102,9 @@ function migrateCharacter(char: any): Character {
     },
     inspiration: char.inspiration || false,
 
-    // Future fields (optional)
-    inventory: char.inventory || undefined,
-    currency: char.currency || undefined,
+    // Inventory & currency
+    inventory: char.inventory || [],
+    currency: char.currency || { platinum: 0, gold: 0, silver: 0, copper: 0 },
     cantrips: char.cantrips || undefined
   };
 }
@@ -181,22 +213,23 @@ function createAppStore() {
     },
 
     // Spell Slot Management
-    updateSpellSlot(id: string, level: 1 | 2, current: number) {
+    updateSpellSlot(id: string, level: number, current: number) {
       const char = state.characters.find(c => c.id === id);
       if (!char) return;
 
-      const slotKey = `level${level}` as keyof typeof char.spellSlots;
+      const slotKey = `level${level}`;
+      if (!char.spellSlots[slotKey]) return;
       const maxSlots = char.spellSlots[slotKey].max;
       char.spellSlots[slotKey].current = Math.max(0, Math.min(current, maxSlots));
       this.saveToLocalStorage();
     },
 
-    useSpellSlot(id: string, level: 1 | 2) {
+    useSpellSlot(id: string, level: number) {
       const char = state.characters.find(c => c.id === id);
       if (!char) return;
 
-      const slotKey = `level${level}` as keyof typeof char.spellSlots;
-      if (char.spellSlots[slotKey].current > 0) {
+      const slotKey = `level${level}`;
+      if (char.spellSlots[slotKey] && char.spellSlots[slotKey].current > 0) {
         char.spellSlots[slotKey].current--;
         this.saveToLocalStorage();
       }
@@ -218,35 +251,6 @@ function createAppStore() {
     },
 
     // Resource Management
-    longRest(id: string) {
-      const char = state.characters.find(c => c.id === id);
-      if (!char) return;
-
-      // Restore HP
-      char.hitPoints.current = char.hitPoints.max;
-      char.hitPoints.temporary = 0;
-
-      // Restore spell slots
-      char.spellSlots.level1.current = char.spellSlots.level1.max;
-      char.spellSlots.level2.current = char.spellSlots.level2.max;
-
-      // Restore class features
-      char.classFeatures.forEach(feature => {
-        if (feature.uses) {
-          feature.uses.current = feature.uses.max;
-        }
-      });
-
-      // Restore paladin resources
-      char.paladinResources.layOnHands.current = char.paladinResources.layOnHands.max;
-      char.paladinResources.channelDivinity.current = char.paladinResources.channelDivinity.max;
-
-      // Reset death saves
-      char.deathSaves = { successes: 0, failures: 0, stabilized: false };
-
-      this.saveToLocalStorage();
-    },
-
     useClassFeature(id: string, featureName: string) {
       const char = state.characters.find(c => c.id === id);
       if (!char) return;
@@ -554,10 +558,71 @@ function createAppStore() {
       // Reset death saves
       char.deathSaves = { successes: 0, failures: 0, stabilized: false };
 
+      // Clear concentration
+      char.concentratingOn = null;
+
       // Update timestamp
       char.restResources.lastLongRest = new Date().toISOString();
 
       char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    // Saving Throws
+    toggleSavingThrowProficiency(id: string, ability: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !(ability in char.savingThrowProficiencies)) return;
+      (char.savingThrowProficiencies as any)[ability] = !(char.savingThrowProficiencies as any)[ability];
+      this.saveToLocalStorage();
+    },
+
+    // Concentration
+    setConcentration(id: string, spellName: string | null) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.concentratingOn = spellName;
+      this.saveToLocalStorage();
+    },
+
+    // Armor Class
+    updateArmorClass(id: string, ac: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.combatStats.armorClass = Math.max(0, ac);
+      this.saveToLocalStorage();
+    },
+
+    // Inventory
+    addInventoryItem(id: string, item: import('$lib/types').InventoryItem) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      if (!char.inventory) char.inventory = [];
+      char.inventory.push(item);
+      this.saveToLocalStorage();
+    },
+
+    updateInventoryItem(id: string, itemId: string, updates: Partial<import('$lib/types').InventoryItem>) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.inventory) return;
+      const index = char.inventory.findIndex(i => i.id === itemId);
+      if (index !== -1) {
+        char.inventory[index] = { ...char.inventory[index], ...updates };
+        this.saveToLocalStorage();
+      }
+    },
+
+    removeInventoryItem(id: string, itemId: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.inventory) return;
+      char.inventory = char.inventory.filter(i => i.id !== itemId);
+      this.saveToLocalStorage();
+    },
+
+    updateCurrency(id: string, currency: Partial<import('$lib/types').Currency>) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      if (!char.currency) char.currency = { platinum: 0, gold: 0, silver: 0, copper: 0 };
+      char.currency = { ...char.currency, ...currency };
       this.saveToLocalStorage();
     },
 

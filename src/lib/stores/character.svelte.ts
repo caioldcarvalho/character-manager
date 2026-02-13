@@ -34,9 +34,18 @@ function getDefaultCharacter(): Character {
     classFeatures: [],
     fightingStyle: '',
     paladinResources: { layOnHands: { current: 0, max: 0 }, channelDivinity: { current: 0, max: 0 } },
+    classResources: [],
+    savingThrowProficiencies: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+    concentratingOn: null,
     weapons: [],
     statusConditions: [],
     deathSaves: { successes: 0, failures: 0, stabilized: false },
+    notes: [],
+    hitDice: { current: 1, max: 1, type: 8 },
+    restResources: {},
+    inspiration: false,
+    inventory: [],
+    currency: { platinum: 0, gold: 0, silver: 0, copper: 0 },
     createdAt: new Date(),
     updatedAt: new Date()
   };

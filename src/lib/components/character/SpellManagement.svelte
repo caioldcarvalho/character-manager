@@ -72,6 +72,11 @@
   function canPrepareMore(): boolean {
     return (character?.preparedSpells.length || 0) < maxPreparedSpells;
   }
+
+  function concentrate(spell: { name: string; concentration: boolean }) {
+    if (!character || !spell.concentration) return;
+    appStore.setConcentration(character.id, spell.name);
+  }
 </script>
 
 {#if character}
@@ -103,31 +108,21 @@
 
       <!-- Spell Slots -->
       <div class="mt-6 space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-medium">Espaços de Nível 1</span>
-          <span class="font-bold">
-            {character.spellSlots.level1.current}/{character.spellSlots.level1.max}
-          </span>
-        </div>
-        <div class="w-full bg-secondary rounded-full h-2">
-          <div
-            class="bg-primary h-full rounded-full transition-all"
-            style="width: {(character.spellSlots.level1.current / character.spellSlots.level1.max) * 100}%"
-          ></div>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-medium">Espaços de Nível 2</span>
-          <span class="font-bold">
-            {character.spellSlots.level2.current}/{character.spellSlots.level2.max}
-          </span>
-        </div>
-        <div class="w-full bg-secondary rounded-full h-2">
-          <div
-            class="bg-magic h-full rounded-full transition-all"
-            style="width: {(character.spellSlots.level2.current / character.spellSlots.level2.max) * 100}%"
-          ></div>
-        </div>
+        {#each Object.entries(character.spellSlots).filter(([_, s]) => s.max > 0).sort(([a], [b]) => parseInt(a.replace('level', '')) - parseInt(b.replace('level', ''))) as [key, slot]}
+          {@const level = parseInt(key.replace('level', ''))}
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium">Espaços de Nível {level}</span>
+            <span class="font-bold">
+              {slot.current}/{slot.max}
+            </span>
+          </div>
+          <div class="w-full bg-secondary rounded-full h-2">
+            <div
+              class="bg-primary h-full rounded-full transition-all"
+              style="width: {slot.max > 0 ? (slot.current / slot.max) * 100 : 0}%"
+            ></div>
+          </div>
+        {/each}
       </div>
     </Card>
 
@@ -142,8 +137,9 @@
           class="px-3 py-2 bg-secondary border border-input rounded-md text-sm"
         >
           <option value="all">Todos os Níveis</option>
-          <option value={1}>Nível 1</option>
-          <option value={2}>Nível 2</option>
+          {#each Object.keys(spellsByLevel()).map(Number).sort((a, b) => a - b) as lvl}
+            <option value={lvl}>Nível {lvl}</option>
+          {/each}
         </select>
       </div>
 
@@ -217,6 +213,14 @@
                       <div class="text-sm text-foreground/80">
                         {spell.description}
                       </div>
+                      {#if spell.concentration}
+                        <button
+                          onclick={() => concentrate(spell)}
+                          class="mt-2 px-3 py-1 bg-magic/20 hover:bg-magic/30 text-magic-foreground border border-magic/30 rounded-md text-xs font-medium transition-colors"
+                        >
+                          Concentrar nesta magia
+                        </button>
+                      {/if}
                     </div>
                   {/if}
                 </div>

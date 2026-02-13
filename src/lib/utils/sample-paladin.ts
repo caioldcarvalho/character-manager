@@ -120,8 +120,20 @@ export function createSamplePaladin(): Character {
         range: '30/120 pés'
       }
     ],
+    classResources: [],
+    savingThrowProficiencies: {
+      strength: false, dexterity: false, constitution: false,
+      intelligence: false, wisdom: true, charisma: true
+    },
+    concentratingOn: null,
     statusConditions: [],
     deathSaves: { successes: 0, failures: 0, stabilized: false },
+    notes: [],
+    hitDice: { current: level, max: level, type: 10 },
+    restResources: {},
+    inspiration: false,
+    inventory: [],
+    currency: { platinum: 0, gold: 0, silver: 0, copper: 0 },
     createdAt: new Date(),
     updatedAt: new Date()
   };

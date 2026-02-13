@@ -29,10 +29,18 @@ export interface Skill {
   proficient: boolean;
 }
 
-// Spell slots by level
+// Saving throw proficiencies
+export type SavingThrowProficiencies = Record<keyof AbilityScores, boolean>;
+
+// Spell slot for a single level
+export interface SpellSlotLevel {
+  current: number;
+  max: number;
+}
+
+// Spell slots by level (1-9)
 export interface SpellSlots {
-  level1: { current: number; max: number };
-  level2: { current: number; max: number };
+  [key: string]: SpellSlotLevel;
 }
 
 // Individual spell
@@ -162,6 +170,8 @@ export interface Character {
   fightingStyle: string;
   paladinResources: PaladinResources;
   classResources: ClassResource[];
+  savingThrowProficiencies: SavingThrowProficiencies;
+  concentratingOn: string | null;
   psionicDice?: PsionicDice;
   weapons: Weapon[];
   statusConditions: string[];
