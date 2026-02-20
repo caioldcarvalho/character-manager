@@ -76,8 +76,18 @@ export function calculateSpellAttackBonus(character: Character): number {
   return character.combatStats.proficiencyBonus + abilityMod + getModifierTotal(character, 'spellAttackBonus');
 }
 
-// Calculate prepared spell count (CHA modifier + half paladin level, minimum 1)
+// Calculate prepared spell count (class-aware)
 export function calculatePreparedSpellCount(character: Character): number {
+  const classIndex = character.class?.index;
+
+  if (classIndex === 'druid' || classIndex === 'cleric') {
+    // WIS mod + full level
+    const wisScore = getFinalAbilityScore(character, 'wisdom');
+    const wisMod = calculateModifier(wisScore);
+    return Math.max(1, wisMod + character.level);
+  }
+
+  // Default: paladin (CHA mod + half level)
   const chaScore = getFinalAbilityScore(character, 'charisma');
   const chaModifier = calculateModifier(chaScore);
   const halfLevel = Math.floor(character.level / 2);

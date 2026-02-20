@@ -1,6 +1,7 @@
 import type { Character, Skill, CharacterFeat } from '$lib/types';
 import { DND_SKILLS, getProficiencyBonus } from '$lib/constants/dnd';
 import { PALADIN_SPELLS } from '$lib/constants/paladin-spells';
+import { MOON_DRUID_BEAST_FORMS } from '$lib/constants/druid';
 
 interface AppState {
   characters: Character[];
@@ -99,6 +100,7 @@ function migrateCharacter(char: any): Character {
     savingThrowProficiencies: char.savingThrowProficiencies || deriveSavingThrowProficiencies(char),
     concentratingOn: char.concentratingOn ?? null,
     psionicDice: char.psionicDice || undefined,
+    wildShape: char.wildShape || undefined,
     weapons: char.weapons || [],
     statusConditions: char.statusConditions || [],
     deathSaves: char.deathSaves || { successes: 0, failures: 0, stabilized: false },
@@ -321,6 +323,69 @@ function createAppStore() {
       }
     },
 
+    // Wild Shape
+    useWildShape(id: string, formId: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.wildShape) return;
+
+      const formDef = MOON_DRUID_BEAST_FORMS.find(f => f.id === formId);
+      if (!formDef) return;
+
+      const cost = formDef.isElemental ? 2 : 1;
+      if (char.wildShape.usesRemaining < cost) return;
+
+      char.wildShape.usesRemaining -= cost;
+      char.wildShape.activeForm = {
+        formId: formDef.id,
+        name: formDef.name,
+        nameIxalan: formDef.nameIxalan,
+        cr: formDef.cr,
+        currentHP: formDef.maxHP,
+        maxHP: formDef.maxHP,
+        armorClass: formDef.armorClass,
+        speed: formDef.speed,
+        attacks: [...formDef.attacks],
+        specialAbilities: [...formDef.specialAbilities],
+        isElemental: formDef.isElemental
+      };
+      this.saveToLocalStorage();
+    },
+
+    revertWildShape(id: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.wildShape) return;
+
+      char.wildShape.activeForm = null;
+      this.saveToLocalStorage();
+    },
+
+    takeBeastDamage(id: string, damage: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.wildShape?.activeForm) return;
+
+      const form = char.wildShape.activeForm;
+      const remaining = form.currentHP - damage;
+
+      if (remaining <= 0) {
+        // Overflow damage to humanoid HP
+        const overflow = Math.abs(remaining);
+        char.wildShape.activeForm = null;
+        char.hitPoints.current = Math.max(0, char.hitPoints.current - overflow);
+      } else {
+        form.currentHP = remaining;
+      }
+      this.saveToLocalStorage();
+    },
+
+    healBeastForm(id: string, amount: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.wildShape?.activeForm) return;
+
+      const form = char.wildShape.activeForm;
+      form.currentHP = Math.min(form.maxHP, form.currentHP + amount);
+      this.saveToLocalStorage();
+    },
+
     // Skills
     toggleSkillProficiency(id: string, skillKey: string) {
       const char = state.characters.find(c => c.id === id);
@@ -530,6 +595,12 @@ function createAppStore() {
         });
       }
 
+      // Recover Wild Shape uses
+      if (char.wildShape) {
+        char.wildShape.usesRemaining = char.wildShape.maxUses;
+        char.wildShape.activeForm = null;
+      }
+
       // Recover feat short-rest resources
       char.feats?.forEach(feat => {
         if (!feat.enabled) return;
@@ -586,6 +657,12 @@ function createAppStore() {
       // Restore all psionic dice
       if (char.psionicDice) {
         char.psionicDice.current = char.psionicDice.max;
+      }
+
+      // Restore Wild Shape uses
+      if (char.wildShape) {
+        char.wildShape.usesRemaining = char.wildShape.maxUses;
+        char.wildShape.activeForm = null;
       }
 
       // Reset death saves

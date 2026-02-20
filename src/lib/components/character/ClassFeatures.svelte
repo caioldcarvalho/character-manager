@@ -3,6 +3,7 @@
   import Card from '$lib/components/ui/card.svelte';
   import ClassResourcesPanel from './ClassResourcesPanel.svelte';
   import PsionicDice from './PsionicDice.svelte';
+  import WildShapePanel from './WildShapePanel.svelte';
   import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
   const character = $derived(appStore.activeCharacter);
@@ -79,6 +80,9 @@
 
     <!-- Psionic Dice (Psi Warrior) -->
     <PsionicDice />
+
+    <!-- Wild Shape (Moon Druid) -->
+    <WildShapePanel />
 
     <!-- Class Features List -->
     <div class="space-y-2">

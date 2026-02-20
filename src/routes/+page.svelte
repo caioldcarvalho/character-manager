@@ -3,7 +3,16 @@
   import { goto } from '$app/navigation';
   import Card from '$lib/components/ui/card.svelte';
   import Button from '$lib/components/ui/button.svelte';
-  import { Plus, Upload, Play, MoreVertical, Trash2 } from 'lucide-svelte';
+  import { Plus, Upload, Play, MoreVertical, Trash2, Users } from 'lucide-svelte';
+  import { createSamplePaladin } from '$lib/utils/sample-paladin';
+  import { createSamplePsiWarrior } from '$lib/utils/sample-psi-warrior';
+  import { createSampleMoonDruid } from '$lib/utils/sample-moon-druid';
+
+  function addSampleCharacter(factory: () => import('$lib/types').Character) {
+    const character = factory();
+    appStore.addCharacter(character);
+    goto('/character');
+  }
 
   const characters = $derived(appStore.state.characters);
 
@@ -152,5 +161,38 @@
         {/each}
       </div>
     {/if}
+
+    <!-- Sample Characters -->
+    <div class="mt-12">
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+        <Users size={20} /> Personagens de Exemplo
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button
+          onclick={() => addSampleCharacter(createSamplePaladin)}
+          class="p-4 bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-[var(--glass-blur)] rounded-lg text-left hover:border-primary/50 transition-all"
+        >
+          <div class="text-lg font-bold">Paladino Nível 5</div>
+          <div class="text-sm text-primary">Sir Aldric</div>
+          <div class="text-xs text-muted-foreground mt-1">Humano Paladino com Espada Longa e magias divinas.</div>
+        </button>
+        <button
+          onclick={() => addSampleCharacter(createSamplePsiWarrior)}
+          class="p-4 bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-[var(--glass-blur)] rounded-lg text-left hover:border-primary/50 transition-all"
+        >
+          <div class="text-lg font-bold">Guerreiro Psi Nível 12</div>
+          <div class="text-sm text-primary">Kael Ironmind</div>
+          <div class="text-xs text-muted-foreground mt-1">Humano Guerreiro Psi com dados psiônicos e Espada Grande.</div>
+        </button>
+        <button
+          onclick={() => addSampleCharacter(createSampleMoonDruid)}
+          class="p-4 bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-[var(--glass-blur)] rounded-lg text-left hover:border-primary/50 transition-all"
+        >
+          <div class="text-lg font-bold">Druida da Lua Nível 15</div>
+          <div class="text-sm text-primary">Ixchel Solcrest</div>
+          <div class="text-xs text-muted-foreground mt-1">Humana do Império Solar de Ixalan. Forma Selvagem em dinossauros!</div>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

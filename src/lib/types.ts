@@ -80,6 +80,48 @@ export interface PsionicDice {
   dieSize: number;  // 6 at level 3, 8 at level 5, 10 at level 11
 }
 
+// Beast form attack (for Wild Shape)
+export interface BeastAttack {
+  name: string;
+  attackBonus: number;
+  damage: string;
+  damageType: string;
+  description?: string;
+}
+
+// Static beast form definition
+export interface BeastFormDefinition {
+  id: string;
+  name: string;
+  nameIxalan: string;
+  cr: number;
+  maxHP: number;
+  armorClass: number;
+  speed: string;
+  attacks: BeastAttack[];
+  specialAbilities: string[];
+  isElemental?: boolean;
+}
+
+// Wild Shape runtime state
+export interface WildShapeState {
+  usesRemaining: number;
+  maxUses: number;
+  activeForm: {
+    formId: string;
+    name: string;
+    nameIxalan: string;
+    cr: number;
+    currentHP: number;
+    maxHP: number;
+    armorClass: number;
+    speed: string;
+    attacks: BeastAttack[];
+    specialAbilities: string[];
+    isElemental?: boolean;
+  } | null;
+}
+
 // Paladin resources
 export interface PaladinResources {
   layOnHands: { current: number; max: number };
@@ -241,6 +283,7 @@ export interface Character {
   savingThrowProficiencies: SavingThrowProficiencies;
   concentratingOn: string | null;
   psionicDice?: PsionicDice;
+  wildShape?: WildShapeState;
   weapons: Weapon[];
   statusConditions: string[];
   deathSaves: DeathSaves;
