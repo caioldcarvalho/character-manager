@@ -1,4 +1,4 @@
-import type { Character, Skill } from '$lib/types';
+import type { Character, Skill, CharacterFeat } from '$lib/types';
 import { DND_SKILLS, getProficiencyBonus } from '$lib/constants/dnd';
 import { PALADIN_SPELLS } from '$lib/constants/paladin-spells';
 
@@ -21,20 +21,36 @@ function initializeSkills(proficientSkills: string[] = []): Record<string, Skill
   return skills;
 }
 
-// Migrate spell slots from old 2-level format to 9-level format
-function migrateSpellSlots(slots: any): import('$lib/types').SpellSlots {
-  const defaultSlot = { current: 0, max: 0 };
-  return {
-    level1: slots?.level1 || defaultSlot,
-    level2: slots?.level2 || defaultSlot,
-    level3: slots?.level3 || defaultSlot,
-    level4: slots?.level4 || defaultSlot,
-    level5: slots?.level5 || defaultSlot,
-    level6: slots?.level6 || defaultSlot,
-    level7: slots?.level7 || defaultSlot,
-    level8: slots?.level8 || defaultSlot,
-    level9: slots?.level9 || defaultSlot,
+// Derive saving throw proficiencies from class API data
+function deriveSavingThrowProficiencies(char: any): Record<string, boolean> {
+  const profs: Record<string, boolean> = {
+    strength: false,
+    dexterity: false,
+    constitution: false,
+    intelligence: false,
+    wisdom: false,
+    charisma: false
   };
+
+  const indexToAbility: Record<string, string> = {
+    str: 'strength', dex: 'dexterity', con: 'constitution',
+    int: 'intelligence', wis: 'wisdom', cha: 'charisma'
+  };
+
+  if (char.class?.saving_throws) {
+    for (const st of char.class.saving_throws) {
+      const ability = indexToAbility[st.index];
+      if (ability) profs[ability] = true;
+    }
+  }
+
+  return profs;
+}
+
+// Migrate spell slots to dynamic format
+function migrateSpellSlots(slots: any): Record<string, { current: number; max: number }> {
+  if (!slots) return { level1: { current: 0, max: 0 } };
+  return slots;
 }
 
 // Migrate character to add missing fields
@@ -80,6 +96,8 @@ function migrateCharacter(char: any): Character {
       channelDivinity: { current: 1, max: 1 }
     },
     classResources: char.classResources || [],
+    savingThrowProficiencies: char.savingThrowProficiencies || deriveSavingThrowProficiencies(char),
+    concentratingOn: char.concentratingOn ?? null,
     psionicDice: char.psionicDice || undefined,
     weapons: char.weapons || [],
     statusConditions: char.statusConditions || [],
@@ -102,10 +120,11 @@ function migrateCharacter(char: any): Character {
     spellcastingAbility: char.spellcastingAbility ?? defaultSpellcastingAbility,
     isWarlock,
 
-    // Future fields (optional)
-    inventory: char.inventory || undefined,
-    currency: char.currency || undefined,
-    cantrips: char.cantrips || undefined
+    // Inventory & currency
+    inventory: char.inventory || [],
+    currency: char.currency || { platinum: 0, gold: 0, silver: 0, copper: 0 },
+    cantrips: char.cantrips || undefined,
+    feats: char.feats || []
   };
 }
 
@@ -215,7 +234,8 @@ function createAppStore() {
       const char = state.characters.find(c => c.id === id);
       if (!char || level < 1 || level > 9) return;
 
-      const slotKey = `level${level}` as keyof typeof char.spellSlots;
+      const slotKey = `level${level}`;
+      if (!char.spellSlots[slotKey]) return;
       const maxSlots = char.spellSlots[slotKey].max;
       char.spellSlots[slotKey].current = Math.max(0, Math.min(current, maxSlots));
       this.saveToLocalStorage();
@@ -225,8 +245,8 @@ function createAppStore() {
       const char = state.characters.find(c => c.id === id);
       if (!char || level < 1 || level > 9) return;
 
-      const slotKey = `level${level}` as keyof typeof char.spellSlots;
-      if (char.spellSlots[slotKey].current > 0) {
+      const slotKey = `level${level}`;
+      if (char.spellSlots[slotKey] && char.spellSlots[slotKey].current > 0) {
         char.spellSlots[slotKey].current--;
         this.saveToLocalStorage();
       }
@@ -510,6 +530,14 @@ function createAppStore() {
         });
       }
 
+      // Recover feat short-rest resources
+      char.feats?.forEach(feat => {
+        if (!feat.enabled) return;
+        feat.resources.forEach(res => {
+          if (res.rechargeOn === 'short') res.current = res.max;
+        });
+      });
+
       // Update timestamp
       char.restResources.lastShortRest = new Date().toISOString();
 
@@ -563,10 +591,79 @@ function createAppStore() {
       // Reset death saves
       char.deathSaves = { successes: 0, failures: 0, stabilized: false };
 
+      // Recover feat resources (both short and long rest)
+      char.feats?.forEach(feat => {
+        if (!feat.enabled) return;
+        feat.resources.forEach(res => {
+          res.current = res.max;
+        });
+      });
+
+      // Clear concentration
+      char.concentratingOn = null;
+
       // Update timestamp
       char.restResources.lastLongRest = new Date().toISOString();
 
       char.updatedAt = new Date();
+      this.saveToLocalStorage();
+    },
+
+    // Saving Throws
+    toggleSavingThrowProficiency(id: string, ability: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !(ability in char.savingThrowProficiencies)) return;
+      (char.savingThrowProficiencies as any)[ability] = !(char.savingThrowProficiencies as any)[ability];
+      this.saveToLocalStorage();
+    },
+
+    // Concentration
+    setConcentration(id: string, spellName: string | null) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.concentratingOn = spellName;
+      this.saveToLocalStorage();
+    },
+
+    // Armor Class
+    updateArmorClass(id: string, ac: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      char.combatStats.armorClass = Math.max(0, ac);
+      this.saveToLocalStorage();
+    },
+
+    // Inventory
+    addInventoryItem(id: string, item: import('$lib/types').InventoryItem) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      if (!char.inventory) char.inventory = [];
+      char.inventory.push(item);
+      this.saveToLocalStorage();
+    },
+
+    updateInventoryItem(id: string, itemId: string, updates: Partial<import('$lib/types').InventoryItem>) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.inventory) return;
+      const index = char.inventory.findIndex(i => i.id === itemId);
+      if (index !== -1) {
+        char.inventory[index] = { ...char.inventory[index], ...updates };
+        this.saveToLocalStorage();
+      }
+    },
+
+    removeInventoryItem(id: string, itemId: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.inventory) return;
+      char.inventory = char.inventory.filter(i => i.id !== itemId);
+      this.saveToLocalStorage();
+    },
+
+    updateCurrency(id: string, currency: Partial<import('$lib/types').Currency>) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      if (!char.currency) char.currency = { platinum: 0, gold: 0, silver: 0, copper: 0 };
+      char.currency = { ...char.currency, ...currency };
       this.saveToLocalStorage();
     },
 
@@ -576,6 +673,49 @@ function createAppStore() {
       char.inspiration = !char.inspiration;
       char.updatedAt = new Date();
       this.saveToLocalStorage();
+    },
+
+    // Feats
+    addFeat(id: string, feat: CharacterFeat) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char) return;
+      if (!char.feats) char.feats = [];
+      char.feats.push(feat);
+      this.saveToLocalStorage();
+    },
+
+    removeFeat(id: string, featIndex: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats) return;
+      char.feats.splice(featIndex, 1);
+      this.saveToLocalStorage();
+    },
+
+    toggleFeatEnabled(id: string, featIndex: number) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats || !char.feats[featIndex]) return;
+      char.feats[featIndex].enabled = !char.feats[featIndex].enabled;
+      this.saveToLocalStorage();
+    },
+
+    useFeatResource(id: string, featIndex: number, resourceName: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats || !char.feats[featIndex]) return;
+      const resource = char.feats[featIndex].resources.find(r => r.name === resourceName);
+      if (resource && resource.current > 0) {
+        resource.current--;
+        this.saveToLocalStorage();
+      }
+    },
+
+    updateFeatChoice(id: string, featIndex: number, choiceId: string, optionId: string) {
+      const char = state.characters.find(c => c.id === id);
+      if (!char || !char.feats || !char.feats[featIndex]) return;
+      const choice = char.feats[featIndex].choices.find(c => c.id === choiceId);
+      if (choice) {
+        choice.selectedOptionId = optionId;
+        this.saveToLocalStorage();
+      }
     }
   };
 }

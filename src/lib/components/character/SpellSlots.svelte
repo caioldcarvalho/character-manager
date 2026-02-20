@@ -2,7 +2,6 @@
   import { appStore } from '$lib/stores/app.svelte';
   import Card from '$lib/components/ui/card.svelte';
   import { Moon } from 'lucide-svelte';
-  import type { SpellSlots } from '$lib/types';
 
   const character = $derived(appStore.activeCharacter);
 
@@ -20,25 +19,28 @@
 
   const LEVEL_NAMES = ['', 'Nível 1', 'Nível 2', 'Nível 3', 'Nível 4', 'Nível 5', 'Nível 6', 'Nível 7', 'Nível 8', 'Nível 9'];
 
-  // Get active slot levels (those with max > 0)
+  // Get active slot levels (those with max > 0) using dynamic keys
   const activeSlotLevels = $derived.by(() => {
     if (!character) return [];
-    const levels: number[] = [];
-    for (let i = 1; i <= 9; i++) {
-      const key = `level${i}` as keyof SpellSlots;
-      if (character.spellSlots[key].max > 0) {
-        levels.push(i);
-      }
-    }
-    return levels;
+    return Object.entries(character.spellSlots)
+      .filter(([_, slot]) => slot.max > 0)
+      .map(([key, slot]) => ({
+        key,
+        level: parseInt(key.replace('level', '')),
+        current: slot.current,
+        max: slot.max
+      }))
+      .sort((a, b) => a.level - b.level);
   });
 
   const hasSpellSlots = $derived(activeSlotLevels.length > 0);
 
   function toggleSlot(level: number, slotIndex: number) {
     if (!character) return;
-    const key = `level${level}` as keyof SpellSlots;
-    const slots = character.spellSlots[key];
+    const slotKey = `level${level}`;
+    const slots = character.spellSlots[slotKey];
+    if (!slots) return;
+
     const newCurrent = slotIndex < slots.current ? slots.current - 1 : slots.current + 1;
     appStore.updateSpellSlot(character.id, level, newCurrent);
   }
@@ -68,27 +70,25 @@
     </div>
 
     <div class="space-y-4">
-      {#each activeSlotLevels as level}
-        {@const key = `level${level}` as keyof SpellSlots}
-        {@const slots = character.spellSlots[key]}
-        {@const color = SLOT_COLORS[level]}
+      {#each activeSlotLevels as slot}
+        {@const color = SLOT_COLORS[slot.level] || { active: 'bg-primary border-primary', label: String(slot.level) }}
         <div>
           <div class="text-sm font-medium text-muted-foreground mb-2">
-            {LEVEL_NAMES[level]}
+            {LEVEL_NAMES[slot.level] || `Nível ${slot.level}`}
             <span class="ml-2 text-foreground">
-              {slots.current}/{slots.max}
+              {slot.current}/{slot.max}
             </span>
           </div>
           <div class="flex gap-2 flex-wrap">
-            {#each Array(slots.max) as _, i}
+            {#each Array(slot.max) as _, i}
               <button
-                onclick={() => toggleSlot(level, i)}
-                class="w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center {i < slots.current
+                onclick={() => toggleSlot(slot.level, i)}
+                class="w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center {i < slot.current
                   ? color.active
                   : 'bg-transparent border-muted-foreground/30 hover:border-muted-foreground'}"
-                aria-label="Espaço de magia {LEVEL_NAMES[level]} {i + 1}"
+                aria-label="Espaço de magia {LEVEL_NAMES[slot.level] || `Nível ${slot.level}`} {i + 1}"
               >
-                {#if i < slots.current}
+                {#if i < slot.current}
                   <div class="text-white font-bold text-xs">{color.label}</div>
                 {/if}
               </button>

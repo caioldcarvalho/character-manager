@@ -128,6 +128,11 @@ export function createSamplePaladin(): Character {
         range: '30/120 pés'
       }
     ],
+    savingThrowProficiencies: {
+      strength: false, dexterity: false, constitution: false,
+      intelligence: false, wisdom: true, charisma: true
+    },
+    concentratingOn: null,
     statusConditions: [],
     deathSaves: { successes: 0, failures: 0, stabilized: false },
     notes: [],
@@ -136,6 +141,8 @@ export function createSamplePaladin(): Character {
     inspiration: false,
     spellcastingAbility: 'charisma',
     isWarlock: false,
+    inventory: [],
+    currency: { platinum: 0, gold: 0, silver: 0, copper: 0 },
     createdAt: new Date(),
     updatedAt: new Date()
   };

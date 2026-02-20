@@ -160,6 +160,11 @@ export function createSamplePsiWarrior(): Character {
         range: '150/600 pés'
       }
     ],
+    savingThrowProficiencies: {
+      strength: true, dexterity: false, constitution: true,
+      intelligence: false, wisdom: false, charisma: false
+    },
+    concentratingOn: null,
     statusConditions: [],
     deathSaves: { successes: 0, failures: 0, stabilized: false },
     notes: [],
@@ -172,6 +177,8 @@ export function createSamplePsiWarrior(): Character {
     inspiration: false,
     spellcastingAbility: null,
     isWarlock: false,
+    inventory: [],
+    currency: { platinum: 0, gold: 0, silver: 0, copper: 0 },
     createdAt: new Date(),
     updatedAt: new Date()
   };

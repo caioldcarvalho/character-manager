@@ -4,6 +4,7 @@
   import Button from '$lib/components/ui/button.svelte';
   import Input from '$lib/components/ui/input.svelte';
   import Dropdown from '$lib/components/ui/dropdown.svelte';
+  import Modal from '$lib/components/ui/modal.svelte';
   import type { Note } from '$lib/types';
   import { generateId, formatDate } from '$lib/utils/character';
   import { Plus, Search, Pin, Edit2, Trash2, Save, X } from 'lucide-svelte';
@@ -15,6 +16,11 @@
   let editingNote = $state<Note | null>(null);
   let editContent = $state({ title: '', content: '', category: 'general' as Note['category'] });
   let dropdownOpen = $state(false);
+
+  // Modal state
+  let viewingNote = $state<Note | null>(null);
+  let isEditingInModal = $state(false);
+  let modalOpen = $state(false);
 
   const categories: Array<{ value: Note['category'] | 'all'; label: string }> = [
     { value: 'all', label: 'Todas' },
@@ -56,6 +62,60 @@
   const pinnedNotes = $derived(filteredNotes().filter(n => n.pinned));
   const unpinnedNotes = $derived(filteredNotes().filter(n => !n.pinned));
 
+  function openNoteModal(note: Note) {
+    viewingNote = note;
+    isEditingInModal = false;
+    modalOpen = true;
+  }
+
+  function closeNoteModal() {
+    viewingNote = null;
+    isEditingInModal = false;
+    modalOpen = false;
+  }
+
+  function startEditInModal() {
+    if (!viewingNote) return;
+    editContent = { title: viewingNote.title, content: viewingNote.content, category: viewingNote.category };
+    isEditingInModal = true;
+  }
+
+  function cancelEditInModal() {
+    isEditingInModal = false;
+    editContent = { title: '', content: '', category: 'general' };
+  }
+
+  function saveNoteInModal() {
+    if (!character || !viewingNote) return;
+
+    const updatedNote: Note = {
+      ...viewingNote,
+      title: editContent.title.trim() || 'Sem Título',
+      content: editContent.content.slice(0, 5000),
+      category: editContent.category,
+      updatedAt: new Date().toISOString()
+    };
+
+    appStore.updateNote(character.id, updatedNote.id, updatedNote);
+    viewingNote = updatedNote;
+    isEditingInModal = false;
+    editContent = { title: '', content: '', category: 'general' };
+  }
+
+  function deleteNoteInModal() {
+    if (!character || !viewingNote) return;
+    if (confirm('Deletar esta nota?')) {
+      appStore.deleteNote(character.id, viewingNote.id);
+      closeNoteModal();
+    }
+  }
+
+  function togglePinInModal() {
+    if (!character || !viewingNote) return;
+    appStore.toggleNotePin(character.id, viewingNote.id);
+    viewingNote = { ...viewingNote, pinned: !viewingNote.pinned };
+  }
+
   function startNewNote() {
     editContent = { title: 'Nova Nota', content: '', category: 'general' };
     editingNote = {
@@ -69,15 +129,9 @@
     };
   }
 
-  function startEdit(note: Note) {
-    editingNote = note;
-    editContent = { title: note.title, content: note.content, category: note.category };
-  }
-
   function saveNote() {
     if (!character || !editingNote) return;
 
-    const isNew = !character.notes.find(n => n.id === editingNote.id);
     const updatedNote: Note = {
       ...editingNote,
       title: editContent.title.trim() || 'Sem Título',
@@ -86,30 +140,13 @@
       updatedAt: new Date().toISOString()
     };
 
-    if (isNew) {
-      appStore.addNote(character.id, updatedNote);
-    } else {
-      appStore.updateNote(character.id, updatedNote.id, updatedNote);
-    }
-
+    appStore.addNote(character.id, updatedNote);
     cancelEdit();
   }
 
   function cancelEdit() {
     editingNote = null;
     editContent = { title: '', content: '', category: 'general' };
-  }
-
-  function deleteNote(noteId: string) {
-    if (character && confirm('Deletar esta nota?')) {
-      appStore.deleteNote(character.id, noteId);
-    }
-  }
-
-  function togglePin(noteId: string) {
-    if (character) {
-      appStore.toggleNotePin(character.id, noteId);
-    }
   }
 </script>
 
@@ -151,10 +188,10 @@
       </div>
     </Card>
 
-    <!-- Edit Modal -->
+    <!-- Inline form for new notes only -->
     {#if editingNote}
       <Card variant="glass" class="p-6 animate-fade-in border-primary/50">
-        <h3 class="text-lg font-bold mb-4">{character.notes.find(n => n.id === editingNote?.id) ? 'Editar Nota' : 'Nova Nota'}</h3>
+        <h3 class="text-lg font-bold mb-4">Nova Nota</h3>
 
         <div class="space-y-4">
           <div>
@@ -207,34 +244,12 @@
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {#each pinnedNotes as note (note.id)}
-            <Card variant="glass" class="p-4 hover:border-primary/50 transition-all animate-fade-in">
+            <Card variant="glass" class="p-4 hover:border-primary/50 transition-all animate-fade-in cursor-pointer" onclick={() => openNoteModal(note)}>
               <div class="flex items-start justify-between mb-2">
                 <span class="text-xs px-2 py-1 rounded border {categoryColors[note.category]}">
                   {categories.find(c => c.value === note.category)?.label}
                 </span>
-                <div class="flex gap-1">
-                  <button
-                    onclick={() => togglePin(note.id)}
-                    class="p-1 hover:bg-hover rounded transition-colors"
-                    aria-label="Desfixar"
-                  >
-                    <Pin size={16} class="text-primary fill-primary" />
-                  </button>
-                  <button
-                    onclick={() => startEdit(note)}
-                    class="p-1 hover:bg-hover rounded transition-colors"
-                    aria-label="Editar"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    onclick={() => deleteNote(note.id)}
-                    class="p-1 hover:bg-hover rounded transition-colors text-danger"
-                    aria-label="Deletar"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                <Pin size={16} class="text-primary fill-primary" />
               </div>
               <h4 class="font-bold mb-2">{note.title}</h4>
               <p class="text-sm text-muted-foreground line-clamp-3 mb-2">{note.content || 'Nota vazia'}</p>
@@ -253,34 +268,11 @@
         <h3 class="text-lg font-bold mb-3 text-foreground">Outras Notas</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {#each unpinnedNotes as note (note.id)}
-            <Card variant="glass" class="p-4 hover:border-primary/50 transition-all animate-fade-in">
+            <Card variant="glass" class="p-4 hover:border-primary/50 transition-all animate-fade-in cursor-pointer" onclick={() => openNoteModal(note)}>
               <div class="flex items-start justify-between mb-2">
                 <span class="text-xs px-2 py-1 rounded border {categoryColors[note.category]}">
                   {categories.find(c => c.value === note.category)?.label}
                 </span>
-                <div class="flex gap-1">
-                  <button
-                    onclick={() => togglePin(note.id)}
-                    class="p-1 hover:bg-hover rounded transition-colors"
-                    aria-label="Fixar"
-                  >
-                    <Pin size={16} />
-                  </button>
-                  <button
-                    onclick={() => startEdit(note)}
-                    class="p-1 hover:bg-hover rounded transition-colors"
-                    aria-label="Editar"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    onclick={() => deleteNote(note.id)}
-                    class="p-1 hover:bg-hover rounded transition-colors text-danger"
-                    aria-label="Deletar"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
               </div>
               <h4 class="font-bold mb-2">{note.title}</h4>
               <p class="text-sm text-muted-foreground line-clamp-3 mb-2">{note.content || 'Nota vazia'}</p>
@@ -310,4 +302,84 @@
       </Card>
     {/if}
   </div>
+
+  <!-- Note View/Edit Modal -->
+  <Modal bind:open={modalOpen} title={viewingNote?.title ?? ''} onclose={() => { closeNoteModal(); return true; }}>
+    {#if viewingNote}
+      {#if isEditingInModal}
+        <!-- Edit mode -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Título</label>
+            <Input bind:value={editContent.title} placeholder="Título da nota" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Categoria</label>
+            <select
+              bind:value={editContent.category}
+              class="w-full px-3 py-2 bg-[var(--glass-bg-light)] backdrop-blur-sm border border-input rounded-md text-foreground transition-[var(--transition-base)]"
+            >
+              {#each categories.slice(1) as cat}
+                <option value={cat.value}>{cat.label}</option>
+              {/each}
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">
+              Conteúdo ({editContent.content.length}/5000)
+            </label>
+            <textarea
+              bind:value={editContent.content}
+              placeholder="Escreva sua nota aqui..."
+              maxlength="5000"
+              rows="10"
+              class="w-full px-3 py-2 bg-[var(--glass-bg-light)] backdrop-blur-sm border border-input rounded-md text-foreground resize-none transition-[var(--transition-base)] focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            ></textarea>
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <Button variant="gradient" onclick={saveNoteInModal} class="flex-1">
+              <Save size={16} /> Salvar
+            </Button>
+            <Button variant="outline" onclick={cancelEditInModal}>
+              <X size={16} /> Cancelar
+            </Button>
+          </div>
+        </div>
+      {:else}
+        <!-- View mode -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2 py-1 rounded border {categoryColors[viewingNote.category]}">
+              {categories.find(c => c.value === viewingNote.category)?.label}
+            </span>
+            {#if viewingNote.pinned}
+              <Pin size={14} class="text-primary fill-primary" />
+            {/if}
+          </div>
+
+          <div class="text-foreground whitespace-pre-wrap">{viewingNote.content || 'Nota vazia'}</div>
+
+          <div class="text-xs text-muted-foreground space-y-1 pt-2 border-t border-border">
+            <p>Criada em: {formatDate(viewingNote.createdAt)}</p>
+            <p>Atualizada em: {formatDate(viewingNote.updatedAt)}</p>
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <Button variant="gradient" onclick={startEditInModal}>
+              <Edit2 size={16} /> Editar
+            </Button>
+            <Button variant="outline" onclick={togglePinInModal}>
+              <Pin size={16} /> {viewingNote.pinned ? 'Desfixar' : 'Fixar'}
+            </Button>
+            <Button variant="outline" onclick={deleteNoteInModal} class="text-danger hover:text-danger">
+              <Trash2 size={16} /> Deletar
+            </Button>
+          </div>
+        </div>
+      {/if}
+    {/if}
+  </Modal>
 {/if}
