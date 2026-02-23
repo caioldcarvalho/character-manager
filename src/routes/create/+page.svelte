@@ -11,8 +11,8 @@
   import { getProficiencyBonus } from '$lib/constants/dnd';
   import type { APIReference, Race, CharacterClass } from '$lib/types';
   import { goto } from '$app/navigation';
-  import { createSamplePaladin } from '$lib/utils/sample-paladin';
-  import { createSamplePsiWarrior } from '$lib/utils/sample-psi-warrior';
+  import paladinSample from '$lib/samples/paladin.json';
+  import psiWarriorSample from '$lib/samples/psi-warrior.json';
   import { Upload, UserPlus, Loader2 } from 'lucide-svelte';
 
   let currentStep = $state(0);
@@ -284,14 +284,12 @@
   }
 
   function loadSamplePaladin() {
-    const paladin = createSamplePaladin();
-    appStore.addCharacter(paladin);
+    appStore.addCharacter({ ...paladinSample, id: `${paladinSample.id}-${Date.now()}` } as any);
     goto('/character');
   }
 
   function loadSamplePsiWarrior() {
-    const psiWarrior = createSamplePsiWarrior();
-    appStore.addCharacter(psiWarrior);
+    appStore.addCharacter({ ...psiWarriorSample, id: `${psiWarriorSample.id}-${Date.now()}` } as any);
     goto('/character');
   }
 

@@ -1,0 +1,229 @@
+{
+  "id": "sample-psi-warrior",
+  "name": "Kael Ironmind",
+  "level": 12,
+  "abilityScores": {
+    "strength": 18,
+    "dexterity": 14,
+    "constitution": 16,
+    "intelligence": 14,
+    "wisdom": 10,
+    "charisma": 8
+  },
+  "race": {
+    "index": "human",
+    "name": "Humano",
+    "speed": 30,
+    "ability_bonuses": [
+      { "ability_score": { "index": "str", "name": "STR", "url": "" }, "bonus": 1 },
+      { "ability_score": { "index": "int", "name": "INT", "url": "" }, "bonus": 1 }
+    ],
+    "alignment": "Humanos não tendem a nenhum alinhamento em particular",
+    "age": "Humanos atingem a maturidade no final da adolescência e vivem menos de um século.",
+    "size": "Médio",
+    "size_description": "Humanos variam muito em altura e compleição, de 1,50 m a 1,80 m. Independente da sua posição, seu tamanho é Médio.",
+    "starting_proficiencies": [],
+    "languages": [
+      { "index": "common", "name": "Comum", "url": "" }
+    ],
+    "language_desc": "Você pode falar, ler e escrever Comum.",
+    "traits": [],
+    "subraces": []
+  },
+  "class": {
+    "index": "fighter",
+    "name": "Guerreiro",
+    "hit_die": 10,
+    "proficiencies": [
+      { "index": "all-armor", "name": "Todas as armaduras", "url": "" },
+      { "index": "shields", "name": "Escudos", "url": "" },
+      { "index": "simple-weapons", "name": "Armas simples", "url": "" },
+      { "index": "martial-weapons", "name": "Armas marciais", "url": "" }
+    ],
+    "saving_throws": [
+      { "index": "str", "name": "Força", "url": "" },
+      { "index": "con", "name": "Constituição", "url": "" }
+    ],
+    "url": "/api/classes/fighter"
+  },
+  "hitPoints": { "current": 112, "max": 112, "temporary": 0 },
+  "combatStats": {
+    "initiative": 2,
+    "armorClass": 18,
+    "speed": 30,
+    "proficiencyBonus": 4
+  },
+  "skills": {
+    "acrobatics":    { "name": "Acrobacia",          "ability": "dexterity",     "proficient": false },
+    "animalHandling":{ "name": "Lidar com Animais",  "ability": "wisdom",        "proficient": false },
+    "arcana":        { "name": "Arcanismo",           "ability": "intelligence",  "proficient": false },
+    "athletics":     { "name": "Atletismo",           "ability": "strength",      "proficient": true  },
+    "deception":     { "name": "Enganação",           "ability": "charisma",      "proficient": false },
+    "history":       { "name": "História",            "ability": "intelligence",  "proficient": false },
+    "insight":       { "name": "Intuição",            "ability": "wisdom",        "proficient": false },
+    "intimidation":  { "name": "Intimidação",         "ability": "charisma",      "proficient": false },
+    "investigation": { "name": "Investigação",        "ability": "intelligence",  "proficient": false },
+    "medicine":      { "name": "Medicina",            "ability": "wisdom",        "proficient": false },
+    "nature":        { "name": "Natureza",            "ability": "intelligence",  "proficient": false },
+    "perception":    { "name": "Percepção",           "ability": "wisdom",        "proficient": true  },
+    "performance":   { "name": "Atuação",             "ability": "charisma",      "proficient": false },
+    "persuasion":    { "name": "Persuasão",           "ability": "charisma",      "proficient": false },
+    "religion":      { "name": "Religião",            "ability": "intelligence",  "proficient": false },
+    "sleightOfHand": { "name": "Prestidigitação",     "ability": "dexterity",     "proficient": false },
+    "stealth":       { "name": "Furtividade",         "ability": "dexterity",     "proficient": false },
+    "survival":      { "name": "Sobrevivência",       "ability": "wisdom",        "proficient": false }
+  },
+  "spellSlots": {
+    "level1": { "current": 0, "max": 0 },
+    "level2": { "current": 0, "max": 0 },
+    "level3": { "current": 0, "max": 0 },
+    "level4": { "current": 0, "max": 0 },
+    "level5": { "current": 0, "max": 0 },
+    "level6": { "current": 0, "max": 0 },
+    "level7": { "current": 0, "max": 0 },
+    "level8": { "current": 0, "max": 0 },
+    "level9": { "current": 0, "max": 0 }
+  },
+  "knownSpells": [],
+  "preparedSpells": [],
+  "classFeatures": [
+    {
+      "name": "Estilo de Luta",
+      "level": 1,
+      "description": "Você escolhe um estilo de luta que oferece benefícios especiais em combate."
+    },
+    {
+      "name": "Retomar o Fôlego",
+      "level": 1,
+      "uses": { "current": 1, "max": 1 },
+      "description": "Ação bônus: recupera 1d10 + nível de HP. Recarrega em descanso curto."
+    },
+    {
+      "name": "Surto de Ação",
+      "level": 2,
+      "uses": { "current": 1, "max": 1 },
+      "description": "Uma ação adicional. Recarrega em descanso curto."
+    },
+    {
+      "name": "Ataque Extra",
+      "level": 5,
+      "description": "Você pode atacar duas vezes, em vez de uma, quando usar a ação de Ataque em seu turno."
+    },
+    {
+      "name": "Ataque Extra (2)",
+      "level": 11,
+      "description": "Quando você usa a ação de Ataque em seu turno, você pode atacar três vezes, em vez de duas."
+    },
+    {
+      "name": "Indomável",
+      "level": 9,
+      "uses": { "current": 1, "max": 1 },
+      "description": "Quando você faz um teste de resistência que falha, você pode escolher ter sucesso. Recarrega em descanso longo."
+    },
+    {
+      "name": "Campo Protetor",
+      "level": 3,
+      "description": "Reação: quando você ou um aliado a 9m de você toma dano, você pode reduzir esse dano em 1d10 + INT mod."
+    },
+    {
+      "name": "Golpe Psiônico",
+      "level": 3,
+      "description": "Quando você acerta um alvo com um ataque com arma, você pode gastar um dado psiônico para infligir 1d10 + INT mod de dano psíquico extra."
+    },
+    {
+      "name": "Movimento Telecinético",
+      "level": 3,
+      "description": "Ação: você pode mover um objeto Grande ou criatura voluntária até 9m. Requer linha de visão."
+    },
+    {
+      "name": "Salto Psiônico",
+      "level": 7,
+      "description": "Ação bônus: você voa até 2× seu deslocamento. Termina ao final do turno."
+    },
+    {
+      "name": "Impulso Telecinético",
+      "level": 7,
+      "description": "Após Golpe Psiônico, o alvo faz save FOR ou é empurrado 3m e derrubado no chão."
+    },
+    {
+      "name": "Mente Guardada",
+      "level": 10,
+      "description": "Você ganha resistência a dano psíquico. Você pode gastar um dado psiônico para terminar uma condição amedrontado ou enfeitiçado."
+    }
+  ],
+  "fightingStyle": "Defesa",
+  "paladinResources": {
+    "layOnHands": { "current": 0, "max": 0 },
+    "channelDivinity": { "current": 0, "max": 0 }
+  },
+  "classResources": [
+    {
+      "name": "Retomar o Fôlego",
+      "current": 1,
+      "max": 1,
+      "rechargeOn": "short",
+      "description": "Ação bônus: recupera 1d10 + 12 de HP."
+    },
+    {
+      "name": "Surto de Ação",
+      "current": 1,
+      "max": 1,
+      "rechargeOn": "short",
+      "description": "Uma ação adicional em seu turno."
+    },
+    {
+      "name": "Indomável",
+      "current": 1,
+      "max": 1,
+      "rechargeOn": "long",
+      "description": "Refaz um teste de resistência que falhou."
+    }
+  ],
+  "psionicDice": { "current": 8, "max": 8, "dieSize": 10 },
+  "wildShape": null,
+  "weapons": [
+    {
+      "id": "greatsword-1",
+      "name": "Espada Grande",
+      "type": "melee",
+      "damageType": "slashing",
+      "damageDice": "2d6",
+      "properties": ["two-handed"],
+      "equipped": true,
+      "finesse": false
+    },
+    {
+      "id": "longbow-1",
+      "name": "Arco Longo",
+      "type": "ranged",
+      "damageType": "piercing",
+      "damageDice": "1d8",
+      "properties": ["ammunition (range 150/600)", "heavy", "two-handed"],
+      "equipped": false,
+      "finesse": false,
+      "range": "150/600 pés"
+    }
+  ],
+  "savingThrowProficiencies": {
+    "strength": true,
+    "dexterity": false,
+    "constitution": true,
+    "intelligence": false,
+    "wisdom": false,
+    "charisma": false
+  },
+  "concentratingOn": null,
+  "statusConditions": [],
+  "deathSaves": { "successes": 0, "failures": 0, "stabilized": false },
+  "notes": [],
+  "hitDice": { "current": 12, "max": 12, "type": 10 },
+  "restResources": {},
+  "inspiration": false,
+  "spellcastingAbility": null,
+  "isWarlock": false,
+  "inventory": [],
+  "currency": { "platinum": 0, "gold": 0, "silver": 0, "copper": 0 },
+  "feats": [],
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z"
+}

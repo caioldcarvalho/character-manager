@@ -1,0 +1,524 @@
+{
+  "id": "sample-moon-druid",
+  "name": "Ixchel Solcrest",
+  "level": 15,
+  "abilityScores": {
+    "strength": 10,
+    "dexterity": 14,
+    "constitution": 16,
+    "intelligence": 8,
+    "wisdom": 20,
+    "charisma": 12
+  },
+  "race": {
+    "index": "human",
+    "name": "Humano (Variante)",
+    "speed": 30,
+    "ability_bonuses": [],
+    "alignment": "Neutro bom — protetor da natureza de Ixalan",
+    "age": "Humanos atingem a maturidade no final da adolescência e vivem menos de um século.",
+    "size": "Médio",
+    "size_description": "Humanos variam muito em altura e compleição. Independente da posição, seu tamanho é Médio.",
+    "starting_proficiencies": [],
+    "languages": [
+      { "index": "common", "name": "Comum", "url": "" },
+      { "index": "druidic", "name": "Druídico", "url": "" }
+    ],
+    "language_desc": "Você pode falar, ler e escrever Comum e Druídico.",
+    "traits": [],
+    "subraces": []
+  },
+  "class": {
+    "index": "druid",
+    "name": "Druida",
+    "hit_die": 8,
+    "proficiencies": [
+      { "index": "light-armor", "name": "Armaduras leves", "url": "" },
+      { "index": "medium-armor", "name": "Armaduras médias", "url": "" },
+      { "index": "shields", "name": "Escudos", "url": "" },
+      { "index": "simple-weapons", "name": "Armas simples", "url": "" }
+    ],
+    "saving_throws": [
+      { "index": "int", "name": "Inteligência", "url": "" },
+      { "index": "wis", "name": "Sabedoria", "url": "" }
+    ],
+    "url": "/api/classes/druid"
+  },
+  "hitPoints": { "current": 123, "max": 123, "temporary": 0 },
+  "combatStats": {
+    "initiative": 2,
+    "armorClass": 16,
+    "speed": 30,
+    "proficiencyBonus": 5
+  },
+  "skills": {
+    "acrobatics":    { "name": "Acrobacia",          "ability": "dexterity",     "proficient": false },
+    "animalHandling":{ "name": "Lidar com Animais",  "ability": "wisdom",        "proficient": true  },
+    "arcana":        { "name": "Arcanismo",           "ability": "intelligence",  "proficient": false },
+    "athletics":     { "name": "Atletismo",           "ability": "strength",      "proficient": false },
+    "deception":     { "name": "Enganação",           "ability": "charisma",      "proficient": false },
+    "history":       { "name": "História",            "ability": "intelligence",  "proficient": false },
+    "insight":       { "name": "Intuição",            "ability": "wisdom",        "proficient": false },
+    "intimidation":  { "name": "Intimidação",         "ability": "charisma",      "proficient": false },
+    "investigation": { "name": "Investigação",        "ability": "intelligence",  "proficient": false },
+    "medicine":      { "name": "Medicina",            "ability": "wisdom",        "proficient": false },
+    "nature":        { "name": "Natureza",            "ability": "intelligence",  "proficient": true  },
+    "perception":    { "name": "Percepção",           "ability": "wisdom",        "proficient": true  },
+    "performance":   { "name": "Atuação",             "ability": "charisma",      "proficient": false },
+    "persuasion":    { "name": "Persuasão",           "ability": "charisma",      "proficient": false },
+    "religion":      { "name": "Religião",            "ability": "intelligence",  "proficient": false },
+    "sleightOfHand": { "name": "Prestidigitação",     "ability": "dexterity",     "proficient": false },
+    "stealth":       { "name": "Furtividade",         "ability": "dexterity",     "proficient": false },
+    "survival":      { "name": "Sobrevivência",       "ability": "wisdom",        "proficient": true  }
+  },
+  "spellSlots": {
+    "level1": { "current": 4, "max": 4 },
+    "level2": { "current": 3, "max": 3 },
+    "level3": { "current": 3, "max": 3 },
+    "level4": { "current": 3, "max": 3 },
+    "level5": { "current": 2, "max": 2 },
+    "level6": { "current": 1, "max": 1 },
+    "level7": { "current": 1, "max": 1 },
+    "level8": { "current": 1, "max": 1 },
+    "level9": { "current": 0, "max": 0 }
+  },
+  "knownSpells": [
+    {
+      "name": "Chicote de Espinhos",
+      "level": 0,
+      "school": "Transmutação",
+      "castingTime": "1 ação",
+      "range": "9 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Você cria um chicote de espinhos que açoita o alvo. Faça um ataque mágico corpo a corpo. Se acertar, o alvo sofre 1d6 de dano perfurante. Aumenta para 2d6 no 5º, 3d6 no 11º, 4d6 no 17º.",
+      "prepared": false
+    },
+    {
+      "name": "Druidismo",
+      "level": 0,
+      "school": "Transmutação",
+      "castingTime": "1 ação",
+      "range": "9 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Cria um efeito natural inofensivo: prever o clima, fazer uma flor desabrochar, criar efeito sensorial ou acender/apagar uma chama.",
+      "prepared": false
+    },
+    {
+      "name": "Chama Produzida",
+      "level": 0,
+      "school": "Conjuração",
+      "castingTime": "1 ação",
+      "range": "Pessoal",
+      "duration": "10 minutos",
+      "concentration": false,
+      "description": "Uma chama aparece na sua mão. Ilumina 3m e escuridão 3m adicionais. Pode arremessá-la para causar 1d8 de dano de fogo.",
+      "prepared": false
+    },
+    {
+      "name": "Curar Ferimentos",
+      "level": 1,
+      "school": "Evocação",
+      "castingTime": "1 ação",
+      "range": "Toque",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Uma criatura que você tocar recupera 1d8 + mod SAB pontos de vida. Não afeta mortos-vivos ou constructos.",
+      "prepared": false
+    },
+    {
+      "name": "Palavra Curativa",
+      "level": 1,
+      "school": "Evocação",
+      "castingTime": "1 ação bônus",
+      "range": "18 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Uma criatura à sua escolha dentro do alcance recupera 1d4 + mod SAB pontos de vida.",
+      "prepared": false
+    },
+    {
+      "name": "Detectar Magia",
+      "level": 1,
+      "school": "Adivinhação",
+      "castingTime": "1 ação",
+      "range": "Pessoal",
+      "duration": "Concentração, até 10 minutos",
+      "concentration": true,
+      "description": "Você sente a presença de magia a até 9m. Pode usar ação para ver aura e escola de magia em criaturas ou objetos visíveis.",
+      "prepared": false
+    },
+    {
+      "name": "Falar com Animais",
+      "level": 1,
+      "school": "Adivinhação",
+      "castingTime": "1 ação",
+      "range": "Pessoal",
+      "duration": "10 minutos",
+      "concentration": false,
+      "description": "Você ganha a habilidade de compreender e se comunicar verbalmente com bestas pela duração.",
+      "prepared": false
+    },
+    {
+      "name": "Onda Trovejante",
+      "level": 1,
+      "school": "Evocação",
+      "castingTime": "1 ação",
+      "range": "Pessoal (4,5m cubo)",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Cada criatura num cubo de 4,5m faz teste CON. Falha: 2d8 trovão e empurrada 3m. Sucesso: metade do dano.",
+      "prepared": false
+    },
+    {
+      "name": "Névoa Obscurecente",
+      "level": 1,
+      "school": "Conjuração",
+      "castingTime": "1 ação",
+      "range": "36 metros",
+      "duration": "Concentração, até 1 hora",
+      "concentration": true,
+      "description": "Cria uma esfera de névoa de 6m de raio. A área é fortemente obscurecida.",
+      "prepared": false
+    },
+    {
+      "name": "Luar",
+      "level": 2,
+      "school": "Evocação",
+      "castingTime": "1 ação",
+      "range": "36 metros",
+      "duration": "Concentração, até 1 minuto",
+      "concentration": true,
+      "description": "Luz prateada num cilindro de 1,5m raio, 12m altura. Criatura que entrar: teste CON ou 2d10 radiante. Metamorfos fazem save com desvantagem.",
+      "prepared": false
+    },
+    {
+      "name": "Metal Escaldante",
+      "level": 2,
+      "school": "Transmutação",
+      "castingTime": "1 ação",
+      "range": "18 metros",
+      "duration": "Concentração, até 1 minuto",
+      "concentration": true,
+      "description": "Escolha um objeto metálico. Qualquer criatura em contato sofre 2d8 fogo. Não pode soltar o objeto. Dano recorrente com ação bônus.",
+      "prepared": false
+    },
+    {
+      "name": "Pele de Árvore",
+      "level": 2,
+      "school": "Transmutação",
+      "castingTime": "1 ação",
+      "range": "Toque",
+      "duration": "Concentração, até 1 hora",
+      "concentration": true,
+      "description": "Alvo tem CA mínima de 16 enquanto não usar armadura.",
+      "prepared": false
+    },
+    {
+      "name": "Restauração Menor",
+      "level": 2,
+      "school": "Abjuração",
+      "castingTime": "1 ação",
+      "range": "Toque",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Toque uma criatura e termine uma doença ou condição: cego, surdo, paralisado ou envenenado.",
+      "prepared": false
+    },
+    {
+      "name": "Conjurar Animais",
+      "level": 3,
+      "school": "Conjuração",
+      "castingTime": "1 ação",
+      "range": "18 metros",
+      "duration": "Concentração, até 1 hora",
+      "concentration": true,
+      "description": "Conjura espíritos feéricos em forma de bestas. Escolha: 1 besta ND 2, 2 ND 1, 4 ND 1/2 ou 8 ND 1/4. Obedecem comandos verbais.",
+      "prepared": false
+    },
+    {
+      "name": "Dissipar Magia",
+      "level": 3,
+      "school": "Abjuração",
+      "castingTime": "1 ação",
+      "range": "36 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Escolha uma criatura, objeto ou efeito mágico. Magias de 3º nível ou inferior terminam. Para mais alto, teste de habilidade CD 10 + nível da magia.",
+      "prepared": false
+    },
+    {
+      "name": "Chamar Relâmpagos",
+      "level": 3,
+      "school": "Conjuração",
+      "castingTime": "1 ação",
+      "range": "36 metros",
+      "duration": "Concentração, até 10 minutos",
+      "concentration": true,
+      "description": "Nuvem de tempestade. Ação: relâmpago num ponto. Criaturas em 1,5m fazem teste DEX: falha 3d10 relâmpago, sucesso metade.",
+      "prepared": false
+    },
+    {
+      "name": "Polimorfar",
+      "level": 4,
+      "school": "Transmutação",
+      "castingTime": "1 ação",
+      "range": "18 metros",
+      "duration": "Concentração, até 1 hora",
+      "concentration": true,
+      "description": "Transforma uma criatura em uma besta de ND igual ou inferior ao nível dela. Assume PV da besta. Ao chegar a 0 PV, reverte.",
+      "prepared": false
+    },
+    {
+      "name": "Muralha de Fogo",
+      "level": 4,
+      "school": "Evocação",
+      "castingTime": "1 ação",
+      "range": "36 metros",
+      "duration": "Concentração, até 1 minuto",
+      "concentration": true,
+      "description": "Cria parede de fogo de 18m comprimento, 6m altura, 30cm espessura. Um lado causa 5d8 fogo.",
+      "prepared": false
+    },
+    {
+      "name": "Curar",
+      "level": 5,
+      "school": "Evocação",
+      "castingTime": "1 ação",
+      "range": "18 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Escolha uma criatura. Ela recupera 70 pontos de vida e é curada de cegueira, surdez e doenças.",
+      "prepared": false
+    },
+    {
+      "name": "Restauração Maior",
+      "level": 5,
+      "school": "Abjuração",
+      "castingTime": "1 ação",
+      "range": "Toque",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Encerre um efeito no alvo: redução de atributo, efeito de encantamento, petrificação, maldição ou redução de PV máximo.",
+      "prepared": false
+    },
+    {
+      "name": "Curar em Massa",
+      "level": 6,
+      "school": "Evocação",
+      "castingTime": "1 ação",
+      "range": "18 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Até 6 criaturas à sua escolha dentro do alcance recuperam 3d8 + mod SAB pontos de vida cada.",
+      "prepared": false
+    },
+    {
+      "name": "Mudança de Plano",
+      "level": 7,
+      "school": "Conjuração",
+      "castingTime": "1 ação",
+      "range": "Toque",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Você e até 8 criaturas voluntárias de mãos dadas são transportados para outro plano de existência.",
+      "prepared": false
+    },
+    {
+      "name": "Formas Animais",
+      "level": 8,
+      "school": "Transmutação",
+      "castingTime": "1 ação",
+      "range": "9 metros",
+      "duration": "Concentração, até 24 horas",
+      "concentration": true,
+      "description": "Até 10 criaturas voluntárias se transformam em bestas de ND 4 ou inferior. Cada uma pode escolher sua forma. PV da besta como PV temporários.",
+      "prepared": false
+    },
+    {
+      "name": "Debilitar Mente",
+      "level": 8,
+      "school": "Encantamento",
+      "castingTime": "1 ação",
+      "range": "45 metros",
+      "duration": "Instantânea",
+      "concentration": false,
+      "description": "Alvo faz teste INT: falha 4d6 dano psíquico, INT e CHA ficam 1 por 30 dias. Sucesso: metade do dano, sem efeito adicional.",
+      "prepared": false
+    }
+  ],
+  "preparedSpells": [],
+  "classFeatures": [
+    {
+      "name": "Druídico",
+      "level": 1,
+      "description": "Você conhece o Druídico, a linguagem secreta dos druidas. Pode falar e usá-la para deixar mensagens ocultas."
+    },
+    {
+      "name": "Conjuração",
+      "level": 1,
+      "description": "Você pode conjurar magias de druida usando Sabedoria como habilidade de conjuração. CD = 8 + proficiência + mod SAB."
+    },
+    {
+      "name": "Forma Selvagem",
+      "level": 2,
+      "uses": { "current": 2, "max": 2 },
+      "description": "Ação: você se transforma em uma besta que já viu. 2 usos por descanso curto ou longo. Dura nível/2 horas."
+    },
+    {
+      "name": "Forma Selvagem de Combate",
+      "level": 2,
+      "description": "Ação bônus para se transformar (em vez de ação). Pode gastar espaço de magia para recuperar 1d8 PV por nível do espaço."
+    },
+    {
+      "name": "Formas do Círculo",
+      "level": 2,
+      "description": "Círculo da Lua: pode se transformar em bestas de ND 1 (nível 2), ND 2 (nível 6), ND 3 (nível 9), ND 4 (nível 12), ND 5 (nível 15)."
+    },
+    {
+      "name": "Golpe Primal",
+      "level": 6,
+      "description": "Seus ataques em forma de besta contam como mágicos para superar resistência e imunidade a ataques não-mágicos."
+    },
+    {
+      "name": "Forma Selvagem Elemental",
+      "level": 10,
+      "description": "Gaste 2 usos de Forma Selvagem para se transformar em um elemental da terra, água, fogo ou ar."
+    },
+    {
+      "name": "Mil Formas",
+      "level": 14,
+      "description": "Você pode conjurar Alterar-se à vontade, sem gastar espaço de magia."
+    }
+  ],
+  "fightingStyle": "",
+  "paladinResources": {
+    "layOnHands": { "current": 0, "max": 0 },
+    "channelDivinity": { "current": 0, "max": 0 }
+  },
+  "classResources": [],
+  "psionicDice": null,
+  "wildShape": {
+    "usesRemaining": 2,
+    "maxUses": 2,
+    "activeForm": null
+  },
+  "weapons": [
+    {
+      "id": "scimitar-1",
+      "name": "Cimitarra",
+      "type": "melee",
+      "damageType": "slashing",
+      "damageDice": "1d6",
+      "properties": ["finesse", "light"],
+      "equipped": true,
+      "finesse": true
+    },
+    {
+      "id": "quarterstaff-1",
+      "name": "Bastão",
+      "type": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d6",
+      "properties": ["versatile (1d8)"],
+      "equipped": false,
+      "finesse": false
+    }
+  ],
+  "savingThrowProficiencies": {
+    "strength": false,
+    "dexterity": false,
+    "constitution": false,
+    "intelligence": true,
+    "wisdom": true,
+    "charisma": false
+  },
+  "concentratingOn": null,
+  "statusConditions": [],
+  "deathSaves": { "successes": 0, "failures": 0, "stabilized": false },
+  "notes": [],
+  "hitDice": { "current": 15, "max": 15, "type": 8 },
+  "restResources": {},
+  "inspiration": false,
+  "spellcastingAbility": "wisdom",
+  "isWarlock": false,
+  "inventory": [
+    {
+      "id": "hide-armor",
+      "name": "Armadura de Couro Batido",
+      "quantity": 1,
+      "weight": 12,
+      "description": "CA 12 + modificador de Destreza (máx 2). Não contém metal.",
+      "type": "armor",
+      "equipped": true
+    },
+    {
+      "id": "wooden-shield",
+      "name": "Escudo de Madeira",
+      "quantity": 1,
+      "weight": 6,
+      "description": "+2 CA. Escudo não-metálico para druidas.",
+      "type": "armor",
+      "equipped": true
+    },
+    {
+      "id": "druidic-focus",
+      "name": "Foco Druídico (Totem Solar Ixalan)",
+      "quantity": 1,
+      "weight": 1,
+      "description": "Totem de madeira esculpido com símbolos do Império Solar de Ixalan. Serve como foco de conjuração.",
+      "type": "equipment",
+      "equipped": true
+    }
+  ],
+  "currency": { "platinum": 0, "gold": 50, "silver": 0, "copper": 0 },
+  "cantrips": ["Chicote de Espinhos", "Druidismo", "Chama Produzida"],
+  "feats": [
+    {
+      "definitionId": "war-caster",
+      "name": "Mago de Guerra",
+      "description": "Vantagem em testes de Constituição para manter concentração. Pode realizar componentes somáticos com armas.",
+      "enabled": true,
+      "modifiers": [],
+      "proficiencies": [],
+      "resources": [],
+      "choices": [
+        {
+          "id": "ability",
+          "label": "+1 Atributo",
+          "options": [
+            { "id": "int", "label": "+1 Inteligência", "modifiers": [{ "target": "ability:intelligence", "value": 1 }] },
+            { "id": "wis", "label": "+1 Sabedoria", "modifiers": [{ "target": "ability:wisdom", "value": 1 }] }
+          ]
+        }
+      ]
+    },
+    {
+      "definitionId": "resilient",
+      "name": "Resiliente",
+      "description": "+1 em um atributo escolhido e proficiência em testes de resistência desse atributo.",
+      "enabled": true,
+      "modifiers": [],
+      "proficiencies": [],
+      "resources": [],
+      "choices": [
+        {
+          "id": "ability",
+          "label": "Atributo",
+          "selectedOptionId": "con",
+          "options": [
+            { "id": "str", "label": "Força", "modifiers": [{ "target": "ability:strength", "value": 1 }], "proficiencies": [{ "type": "savingThrow", "target": "strength" }] },
+            { "id": "dex", "label": "Destreza", "modifiers": [{ "target": "ability:dexterity", "value": 1 }], "proficiencies": [{ "type": "savingThrow", "target": "dexterity" }] },
+            { "id": "con", "label": "Constituição", "modifiers": [{ "target": "ability:constitution", "value": 1 }], "proficiencies": [{ "type": "savingThrow", "target": "constitution" }] },
+            { "id": "int", "label": "Inteligência", "modifiers": [{ "target": "ability:intelligence", "value": 1 }], "proficiencies": [{ "type": "savingThrow", "target": "intelligence" }] },
+            { "id": "wis", "label": "Sabedoria", "modifiers": [{ "target": "ability:wisdom", "value": 1 }], "proficiencies": [{ "type": "savingThrow", "target": "wisdom" }] },
+            { "id": "cha", "label": "Carisma", "modifiers": [{ "target": "ability:charisma", "value": 1 }], "proficiencies": [{ "type": "savingThrow", "target": "charisma" }] }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z"
+}
